@@ -1,0 +1,43 @@
+Lake Name	Biotic_index	xmin	xmax	ymin	ymax	Category
+Halls Lake	Simpsons_Index	2019	2023	0	0.25	Poor
+Big Hawk Lake	Simpsons_Index	2020	2024	0	0.25	Poor
+Little Hawk Lake	Simpsons_Index	2020	2024	0	0.25	Poor
+Halls Lake	Simpsons_Index	2019	2023	0.25	0.5	Fair
+Big Hawk Lake	Simpsons_Index	2020	2024	0.25	0.5	Fair
+Little Hawk Lake	Simpsons_Index	2020	2024	0.25	0.5	Fair
+Halls Lake	Simpsons_Index	2019	2023	0.5	0.75	Good
+Big Hawk Lake	Simpsons_Index	2020	2024	0.5	0.75	Good
+Little Hawk Lake	Simpsons_Index	2020	2024	0.5	0.75	Good
+Halls Lake	Simpsons_Index	2019	2023	0.75	1	Excellent
+Big Hawk Lake	Simpsons_Index	2020	2024	0.75	1	Excellent
+Little Hawk Lake	Simpsons_Index	2020	2024	0.75	1	Excellent
+Halls Lake	mHBI	2019	2023	0	3.75	Very poor
+Halls Lake	mHBI	2019	2023	3.75	4.25	Poor
+Halls Lake	mHBI	2019	2023	4.25	5	Fairly poor
+Halls Lake	mHBI	2019	2023	5	5.75	Fair
+Halls Lake	mHBI	2019	2023	5.75	6.5	Good
+Halls Lake	mHBI	2019	2023	6.5	7.25	Very good
+Halls Lake	mHBI	2019	2023	7.25	10	Excellent
+Big Hawk Lake	mHBI	2020	2024	0	3.75	Very poor
+Big Hawk Lake	mHBI	2020	2024	3.75	4.25	Poor
+Big Hawk Lake	mHBI	2020	2024	4.25	5	Fairly poor
+Big Hawk Lake	mHBI	2020	2024	5	5.75	Fair
+Big Hawk Lake	mHBI	2020	2024	5.75	6.5	Good
+Big Hawk Lake	mHBI	2020	2024	6.5	7.25	Very good
+Big Hawk Lake	mHBI	2020	2024	7.25	10	Excellent
+Little Hawk Lake	mHBI	2020	2024	0	3.75	Very poor
+Little Hawk Lake	mHBI	2020	2024	3.75	4.25	Poor
+Little Hawk Lake	mHBI	2020	2024	4.25	5	Fairly poor
+Little Hawk Lake	mHBI	2020	2024	5	5.75	Fair
+Little Hawk Lake	mHBI	2020	2024	5.75	6.5	Good
+Little Hawk Lake	mHBI	2020	2024	6.5	7.25	Very good
+Little Hawk Lake	mHBI	2020	2024	7.25	10	Excellent
+Halls Lake	Perc_EOT	2019	2023	0	3	Fair
+Halls Lake	Perc_EOT	2019	2023	3	4	Good
+Halls Lake	Perc_EOT	2019	2023	4	85	Excellent
+Big Hawk Lake	Perc_EOT	2020	2024	0	3	Fair
+Big Hawk Lake	Perc_EOT	2020	2024	3	4	Good
+Big Hawk Lake	Perc_EOT	2020	2024	4	85	Excellent
+Little Hawk Lake	Perc_EOT	2020	2024	0	3	Fair
+Little Hawk Lake	Perc_EOT	2020	2024	3	4	Good
+Little Hawk Lake	Perc_EOT	2020	2024	4	85	Excellent
