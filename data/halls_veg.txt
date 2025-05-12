@@ -1,0 +1,16 @@
+Year	Lake	Vegetation_type	HALL-01	HALL-04	HALL-05	HALL-06	HALL-08	HALL-09	HALL-10	HALL-15	HALL-17	HALL-19	HALL-21	HALL-22
+2023	Halls	Algae_floating	NA	NA	NA	0	0	0	1	NA	0	0	NA	NA
+2023	Halls	Algae_filamentous	NA	NA	NA	0	1	1	1	NA	0	1	NA	NA
+2023	Halls	Algae_attached	NA	NA	NA	1	1	2	2	NA	1	2	NA	NA
+2022	Halls	Algae_floating	NA	NA	NA	0	0	0	0	NA	0	NA	NA	NA
+2022	Halls	Algae_filamentous	NA	NA	NA	1	0	0	0	NA	0	NA	NA	NA
+2022	Halls	Algae_attached	NA	NA	NA	1	1	1	1	NA	0	NA	NA	NA
+2021	Halls	Algae_floating	NA	NA	NA	NA	0	0	NA	NA	0	0	1	0
+2021	Halls	Algae_filamentous	NA	NA	NA	NA	0	0	NA	NA	0	0	1	0
+2021	Halls	Algae_attached	NA	NA	NA	NA	0	1	NA	NA	0	0	1	1
+2020	Halls	Algae_floating	NA	NA	NA	0	0	0	0	0	NA	NA	NA	NA
+2020	Halls	Algae_filamentous	NA	NA	NA	0	0	0	0	0	NA	NA	NA	NA
+2020	Halls	Algae_attached	NA	NA	NA	0	0	0	1	1	NA	NA	NA	NA
+2019	Halls	Algae_floating	0	0	0	0	0	0	0	NA	0	0	NA	NA
+2019	Halls	Algae_filamentous	0	0	0	0	0	0	0	NA	0	0	NA	NA
+2019	Halls	Algae_attached	0	0	1	0	1	0	0	NA	0	0	NA	NA

@@ -1,0 +1,16 @@
+Year	Lake	Vegetation_type	LHWK-01	LHWK-02	LHWK-03	LHWK-04	BHWK-01	BHWK-03	BHWK-04	BHWK-05
+2020	Hawk	Algae_floating	0	0	0	0	NA	0	0	0
+2020	Hawk	Algae_filamentous	0	0	1	0	NA	0	0	0
+2020	Hawk	Algae_attached	0	0	1	0	NA	1	1	0
+2021	Hawk	Algae_floating	0	0	0	0	0	0	0	0
+2021	Hawk	Algae_filamentous	0	0	0	0	0	0	0	0
+2021	Hawk	Algae_attached	0	0	0	0	1	0	0	0
+2022	Hawk	Algae_floating	NA	0	0	NA	0	1	0	0
+2022	Hawk	Algae_filamentous	NA	1	0	NA	0	0	0	1
+2022	Hawk	Algae_attached	NA	1	1	NA	1	0	0	1
+2023	Hawk	Algae_floating	0	0	0	1	0	0	1	1
+2023	Hawk	Algae_filamentous	0	1	0	0	1	0	1	1
+2023	Hawk	Algae_attached	1	1	0	2	2	2	1	1
+2024	Hawk	Algae_floating	0	0	0	0	0	1	0	1
+2024	Hawk	Algae_filamentous	0	0	0	0	0	1	1	1
+2024	Hawk	Algae_attached	1	0	0	2	1	0	1	0
