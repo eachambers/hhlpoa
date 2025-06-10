@@ -1,0 +1,2 @@
+Name	Latitude	Longitude
+Kennisis River	45.131455	-78.733070

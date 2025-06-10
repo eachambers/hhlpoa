@@ -1,0 +1,373 @@
+Lake Survey
+================
+
+- [Background](#background)
+- [Import data](#import-data)
+- [Run MANOVA](#run-manova)
+  - [Nature](#nature)
+  - [Development](#development)
+  - [Legislation](#legislation)
+  - [Lake Use](#lake-use)
+  - [Amenities](#amenities)
+
+## Background
+
+We want to assess survey responses based on four factors:
+
+1.  Age of association member
+
+2.  Length of property ownership
+
+3.  The lake that the member has property on
+
+4.  Type of property access
+
+Survey responses have been categorized into five categories:
+
+1.  Nature
+
+2.  Development
+
+3.  Legislation
+
+4.  Lake use
+
+5.  Amenities
+
+# Import data
+
+``` r
+dat <- read_csv(here("data", "lake_plan_survey.csv"))
+```
+
+    ## Rows: 213 Columns: 59
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr  (4): Lake, Age, Duration, Access
+    ## dbl (55): Preserve_Natural_Beauty, Preserve_Natural_Shorelines, Preserve_Uni...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+# Run MANOVA
+
+### Nature
+
+``` r
+# Response variables
+nature_resp <- cbind(dat$Preserve_Natural_Beauty, dat$Preserve_Natural_Shorelines,
+                     dat$Preserve_Unique_Habitats, dat$Protect_Native_Species, 
+                     dat$Control_Invasive_Species, dat$Improve_Water_Quality,
+                     dat$Encourage_Dark_Skies, dat$Increase_Water_Clarity, 
+                     dat$Decrease_Bacterial_Levels, dat$Reduce_Algal_Growth, 
+                     dat$Minimize_Water_Fluctuations)
+
+# Lake as predictor
+Lake_manova <- manova(nature_resp ~ Lake, data = dat)
+# Age
+Age_manova <- manova(nature_resp ~ Age, data = dat)
+# Duration
+Duration_manova <- manova(nature_resp ~ Duration, data = dat)
+# Access
+Access_manova <- manova(nature_resp ~ Access, data = dat)
+
+#Summary
+summary(Lake_manova)
+summary.aov(Lake_manova)
+#Summary
+summary(Age_manova)
+summary.aov(Age_manova)
+#Summary
+summary(Duration_manova)
+summary.aov(Duration_manova)
+#Summary
+summary(Access_manova)
+summary.aov(Access_manova)
+```
+
+Visualize MANOVA results using a profile plot for nature-related
+questions and respondent age as a predictor.
+
+``` r
+# Calculate group-based mean responses
+age_means <- dat %>% 
+  # Group by the predictor variable
+  # TODO change below to whichever predictor variable you want (e.g., Lake, Duration, etc.)
+  group_by(Age) %>% 
+  # TODO change below to whichever response variables relate to the category; in this case I'm specifying a range of columns (denoted using the : symbol) starting from Preserve_Natural_Beauty until Minimize_Water_Fluctuations
+  summarize_at(vars(Preserve_Natural_Beauty:Minimize_Water_Fluctuations), 
+               mean, na.rm = TRUE) %>% 
+  ungroup() %>%
+  # The following 'tidies' the dataset so that you no longer have separate columns for each of the response variables but instead a column for the response variable name and another for the mean value for that particular response
+  # TODO change below to the relevant column names for response variables
+  pivot_longer(cols = Preserve_Natural_Beauty:Minimize_Water_Fluctuations, 
+               names_to = "question", values_to = "mean")
+```
+
+Build the plot I’d shown you! Be sure to modify anything below labeled
+*TODO* for other predictor or response variables.
+
+``` r
+# TODO change data to dataset with means for the predictor variable (here, `age_means`)
+# TODO change below group to whichever predictor variable you want color-coded (here, Age)
+ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
+  # Add colorized rectangles based on which questions were significant in the MANOVA
+  # TODO change xmin and xmax based on where the specific significant questions are plotted and do +/- 0.5 so the box surrounds the data point
+  annotate("rect", xmin = 1.5, xmax = 2.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", alpha = 0.5) +
+  annotate("rect", xmin = 6.5, xmax = 7.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", color = "white", 
+           linewidth = 1, alpha = 0.5) +
+  annotate("rect", xmin = 7.5, xmax = 8.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", color = "white", 
+           linewidth = 1, alpha = 0.5) +
+  # TODO change below to colorize by whichever predictor variable you want
+  geom_line(aes(color = Age)) +
+  # TODO change below to colorize by whichever predictor variable you want
+  geom_point(aes(color = Age)) +
+  # TODO change title of plot to what you'd like
+  ggtitle("Age-based means for nature questions") +
+  # Specify y and x axis titles
+  ylab("Mean response") +
+  xlab("Survey question") +
+  # TODO customize your color palette for each of the predictor variable groups (here, the three age groups)
+  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
+  # Change the x axis text angle so it doesn't overlap and make font size 10
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
+```
+
+![](Lake_Survey_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+# If you want to save the plot above to your current working directory:
+# TODO change "nature_age_means_plot.pdf" to whatever you want the file named
+# TODO change `width` and `height` to whatever dimensions you want (in inches)
+ggsave("nature_age_means_plot.pdf", width = 10, height = 6)
+```
+
+If you want to change the ordering of the survey questions (x axis
+labels):
+
+``` r
+# Specify the class of the survey question column as a factor and change the levels to whatever ordering you want
+age_means$question <- factor(age_means$question, levels = c("Decrease_Bacterial_Levels",
+                                                            "Preserve_Natural_Beauty",
+                                                            "Preserve_Natural_Shorelines",
+                                                            "Control_Invasive_Species",
+                                                            "Encourage_Dark_Skies",
+                                                            "Improve_Water_Quality",
+                                                            "Increase_Water_Clarity",
+                                                            "Minimize_Water_Fluctuations",
+                                                            "Preserve_Unique_Habitats",
+                                                            "Protect_Native_Species",
+                                                            "Reduce_Algal_Growth"))
+
+# Now, build the plot in the exact same way as above and you should see the ordering change
+# You will need to change the colorized boxes such that they're still behind the significant variables which have now changed place:
+ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
+  # Add colorized rectangles based on which questions were significant in the MANOVA
+  annotate("rect", xmin = 0.5, xmax = 1.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", alpha = 0.5) +
+  annotate("rect", xmin = 1.5, xmax = 2.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", color = "white", 
+           linewidth = 1, alpha = 0.5) +
+  annotate("rect", xmin = 2.5, xmax = 3.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", color = "white", 
+           linewidth = 1, alpha = 0.5) +
+  geom_line(aes(color = Age)) +
+  geom_point(aes(color = Age)) +
+  ggtitle("Age-based means for nature questions") +
+  # Specify y and x axis titles
+  ylab("Mean response") +
+  xlab("Survey question") +
+  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
+  # Change the x axis text angle so it doesn't overlap and make font size 10
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
+```
+
+![](Lake_Survey_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+If you want to modify the survey question names (x axis labels), add
+`scale_x_discrete()` with `labels` specified.
+
+``` r
+ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
+  # Add colorized rectangles based on which questions were significant in the MANOVA
+  annotate("rect", xmin = 0.5, xmax = 1.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", alpha = 0.5) +
+  annotate("rect", xmin = 1.5, xmax = 2.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", color = "white", 
+           linewidth = 1, alpha = 0.5) +
+  annotate("rect", xmin = 2.5, xmax = 3.5, ymin = 4, ymax = 5, 
+           fill = "mediumseagreen", color = "white", 
+           linewidth = 1, alpha = 0.5) +
+  geom_line(aes(color = Age)) +
+  geom_point(aes(color = Age)) +
+  ggtitle("Age-based means for nature questions") +
+  # Specify y and x axis titles
+  ylab("Mean response") +
+  xlab("Survey question") +
+  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
+  # Change the x axis text angle so it doesn't overlap and make font size 10
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10)) +
+  # TODO below is what changes the x axis labels:
+  scale_x_discrete(labels = c("Decrease Bacterial Levels",
+                              "Preserve Natural Beauty",
+                              "Preserve Natural Shorelines",
+                              "Control Invasive Species",
+                              "Encourage Dark Skies",
+                              "Improve Water Quality",
+                              "Increase Water Clarity",
+                              "Minimize Water Fluctuations",
+                              "Preserve Unique Habitats",
+                              "Protect Native Species",
+                              "Reduce Algal Growth"))
+```
+
+![](Lake_Survey_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+If you want to instead have the significant questions in a plot to the
+left and the remaining questions to the right:
+
+``` r
+# Add a new column to `age_means` that has whether the variable in that row was sig or not:
+age_means <- age_means %>% 
+  mutate(manova_result = case_when(question %in% c("Decrease_Bacterial_Levels", 
+                                                   "Preserve_Natural_Beauty", 
+                                                   "Preserve_Natural_Shorelines") 
+                                   # Put "sig" in the rows that have the above question
+                                   # within the new column ("manova_result")
+                                   ~ "sig",
+                                   question %in% c("Control_Invasive_Species",
+                                                   "Encourage_Dark_Skies",
+                                                   "Improve_Water_Quality",
+                                                   "Increase_Water_Clarity",
+                                                   "Minimize_Water_Fluctuations",
+                                                   "Preserve_Unique_Habitats",
+                                                   "Protect_Native_Species",
+                                                   "Reduce_Algal_Growth") 
+                                   # Put "nonsig" in the rows that have the above question
+                                   # within the new column ("manova_result")
+                                   ~ "nonsig"))
+
+# I want sig vars plotted first so I'm going to change the levels as I did before:
+age_means$manova_result <- factor(age_means$manova_result, levels = c("sig", "nonsig"))
+
+# Now, we can ask ggplot to build our plot but "facet" it on our newly made column such that the sig vars are in one plot and the non-sig ones are in a second one:
+ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
+  geom_line(aes(color = Age)) +
+  geom_point(aes(color = Age)) +
+  ggtitle("Age-based means for nature questions") +
+  # Specify y and x axis titles
+  ylab("Mean response") +
+  xlab("Survey question") +
+  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
+  # Change the x axis text angle so it doesn't overlap and make font size 10
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        # TODO change the size of the strip text
+        strip.text = element_text(size = 14),
+        # TODO remove grey background of strip
+        strip.background = element_blank()) +
+  # TODO here's the faceting step:
+  facet_grid(~manova_result, 
+             # Only plot sig or non-sig variables
+             scales = "free", 
+             # Standardize spacing
+             space = "free", 
+             # Add custom labels to the strips
+             labeller = as_labeller(c("sig" = "Significant questions",
+                                      "nonsig" = "Non-significant questions")))
+```
+
+![](Lake_Survey_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+### Development
+
+``` r
+# TODO be aware that the column names require `` symbols for a couple of the development-related questions because they have special characters in them (see below)
+manova_access_v_development <- manova(cbind(Condominiums,   
+                                            Trailer_parks,
+                                            Shipping_container_dwellings,   
+                                            `Floating_homes/barges`,
+                                            Timeshare_dwellings, 
+                                            Hobby_farms,
+                                            `Non-residential_commercial_development`,   
+                                            Cell_towers,
+                                            Backlot_development,    
+                                            Shoreline_infrastructure,   
+                                            Shoreline_minimum_setback,
+                                            Shoreline_lot_minimum_frontage, 
+                                            Enforcement_for_upkeep_of_waste_systems)
+                                      ~ Access, data = dat)
+#Summary
+summary(manova_access_v_development)
+summary.aov(manova_access_v_development)
+```
+
+### Legislation
+
+``` r
+manova_age_v_legislation <- manova(cbind(Lower_speeds_in_open_water,
+                                         Lower_speeds_close_to_the_shoreline,
+                                         Watercraft_wake_height,
+                                         Lower_speeds_for_nesting_season,
+                                         Lower_watercraft_noise_levels,
+                                         Safer_operation_of_watercraft, 
+                                         Invasive_species_checks) 
+                                   ~ Age, data = dat)
+#Summary
+summary(manova_age_v_legislation)
+summary.aov(manova_age_v_legislation)
+```
+
+### Lake Use
+
+``` r
+lakeuse_resp <- cbind(dat$Construction_of_water_ski_courses, 
+                      dat$Fishing_and_angling,  
+                      dat$Fishing_tournaments_and_derbies,  
+                      dat$Bait_fish_release,    
+                      dat$Ice_fishing,
+                      dat$Hunting,
+                      dat$Snowmobiling,
+                      dat$ATV_operation,
+                      dat$Camping_facilities,
+                      dat$Number_of_people_using_campsites,
+                      dat$Pollution_from_campsites)
+
+#MANOVA - Age v lake use
+manova_age_v_lakeuse <- manova(lakeuse_resp ~ Age, data = dat)
+
+#Summary
+summary(manova_age_v_lakeuse)
+summary.aov(manova_age_v_lakeuse)
+
+#MANOVA - Access v lake use
+manova_access_v_lakeuse <- manova(lakeuse_resp ~ Access, data = dat)
+#Summary
+summary(manova_access_v_lakeuse)
+summary.aov(manova_access_v_lakeuse)
+```
+
+### Amenities
+
+``` r
+#MANOVA - Access v AMENITIES
+manova_access_v_amenities <- manova(cbind(Frequency_of_O.P.P._marine_patrols,
+                                          Public_boat_launches,
+                                          Availability_of_safe_hiking_trails,
+                                          Availability_of_access_to_managed_snowmobile_trails,
+                                          Availability_of_groomed_cross_country_ski_trails,
+                                          Access_to_safe_ATV_trails,
+                                          Reliable_access_to_high_speed_internet,
+                                          Access_to_reliable_cellular_coverage,
+                                          Reopening_of_Hawk_Lake_landfill,
+                                          Number_of_businesses_offering_gasoline_fueling,
+                                          `Number_and_location_of_parking_facilities_[BHL]`,
+                                          `Number_and_location_of_parking_facilities_[LHL]`,
+                                          Number_of_public_beaches)
+                                    ~ Access, data = dat)
+#Summary
+summary(manova_access_v_amenities)
+summary.aov(manova_access_v_amenities)
+```

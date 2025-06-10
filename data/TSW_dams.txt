@@ -1,0 +1,7 @@
+Type	Name	Short name	Headwater	Latitude	Longitude	Ordering	Category
+Dam	Kennisis Lake Dam	Little Kennisis	Kennisis	45.215328	-78.663418	2	Inside
+Dam	Red Pine Lake Dam	Paint	Kennisis	45.211039	-78.715122	4	Inside
+Dam	Nunikani Lake Dam	Crab	Kennisis	45.184821	-78.744696	6	Inside
+Dam	Big Hawk Lake Dam	Hawk	Kennisis	45.142499	-78.742962	8	Inside
+Dam	Halls Lake Dam	Halls	Kennisis	45.095433	-78.745953	10	Inside
+Dam	Little Brother Lake Dam	Mud	Little Brother	45.130808	-78.759525	2	Inside

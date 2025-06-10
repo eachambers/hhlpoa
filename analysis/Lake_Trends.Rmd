@@ -1,8 +1,8 @@
 ---
 title: "Lake Trends"
-author: "Anne Chambers"
-date: "2025-04-28"
-output: html_document
+output:
+  github_document:
+    toc: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -11,6 +11,9 @@ library(here)
 library(tidyverse)
 library(cowplot)
 library(lubridate)
+library(grid)
+library(gridExtra)
+library(tidyterra)
 theme_set(theme_cowplot())
 
 source(here("analysis", "functions.R"))
@@ -19,6 +22,7 @@ source(here("analysis", "functions.R"))
 lake_cols_raw <- lake_colors(raw_data = TRUE)
 data_cols_warms <- data_colors(type = "warms")
 data_cols <- data_colors(type = "assorted")
+lake_col_full <- lake_colors(full_names = TRUE)
 lake_names <- c("BIG HAWK LAKE", "LITTLE HAWK LAKE", "HALLS LAKE")
 labs <- as_labeller(c("BIG HAWK LAKE" = "Big Hawk Lake", 
               "LITTLE HAWK LAKE" = "Little Hawk Lake", 
@@ -47,11 +51,13 @@ ice %>%
   ggplot(aes(x = Year, y = doy, group = 1)) +
   geom_point(size = 3, color = lake_cols[["bighawk"]]) +
   geom_line(linewidth = 1, color = lake_cols[["bighawk"]]) +
-  geom_smooth(method='lm',se=F, color = "grey40")+
+  geom_smooth(method = 'lm', se = F, color = "grey40")+
   ylab("Day of the year") +
   scale_x_continuous(breaks = scales::breaks_width(5)) +
-  # theme(plot.title = element_text(hjust = 0.5, size = 16)) +
   ggtitle("Ice-out dates for Big Hawk Lake (1968-2025)")
+
+# Save plot in "plots" directory
+ggsave(here("plots", "ice_out.pdf"), width = 10, height = 6)
 ```
 
 Find earliest and latest ice-out dates:
@@ -90,9 +96,6 @@ secchi_dat %>%
   # count(`Lake Name`) # 40 lakes in township
   filter(!`Lake Name` %in% lake_names) %>% 
   summarize(mean(`Secchi Depth (m)`)) # 4.85m (if including ours) or 4.62m if not including ours
-
-# secchi_dat %>% 
-#   filter(`Lake Name` == "REDSTONE LAKE") %>% pull(TOWNSHIP)
 ```
 
 Look at data for only our three lakes:
@@ -107,7 +110,6 @@ secchi %>% summarize(mean(`Secchi Depth (m)`)) # 6.79m
 p_secchi <-
   secchi %>% 
   ggplot(aes(x = Year, y = `Secchi Depth (m)`)) +
-  # geom_point(aes(color = `Lake Name`)) +
   geom_boxplot(aes(color = `Lake Name`, group = Year)) +
   geom_smooth(method = "lm", se = FALSE, color = "grey45", aes(group = 1)) +
   facet_wrap(~`Lake Name`, labeller = labs, scales = "free") +
@@ -120,38 +122,9 @@ p_secchi <-
   ggtitle("Water transparency (1991-2022)") +
   ylab("Secchi depth (m)")
 
-# Linear model for data points
-lm(`Secchi Depth (m)` ~ Year, data = secchi %>% filter(`Lake Name` == "BIG HAWK LAKE")) %>% summary()
-lm(`Secchi Depth (m)` ~ Year, data = secchi %>% filter(`Lake Name` == "LITTLE HAWK LAKE")) %>% summary()
-lm(`Secchi Depth (m)` ~ Year, data = secchi %>% filter(`Lake Name` == "HALLS LAKE")) %>% summary()
-
-# lm(`Secchi Depth (m)` ~ Year, data = secchi_dat %>% filter(`Lake Name` == "BOSHKUNG LAKE")) %>% summary()
-lm(`Secchi Depth (m)` ~ Year, data = secchi_dat %>% filter(`Lake Name` == "KENNISIS LAKE")) %>% summary()
-lm(`Secchi Depth (m)` ~ Year, data = secchi_dat %>% filter(`Lake Name` == "KUSHOG LAKE")) %>% summary()
-```
-
-Look at a single site for each lake, averaged over a year.
-
-```{r}
-secchi %>% 
-  filter(`Lake Name` == "BIG HAWK LAKE" & `Site ID` == 3 |
-           `Lake Name` == "LITTLE HAWK LAKE" & `Site ID` == 1 |
-           `Lake Name` == "HALLS LAKE" & `Site ID` == 2) %>% 
-  group_by(`Lake Name`, Year) %>% 
-  summarize(mean_depth = mean(`Secchi Depth (m)`)) %>% 
-  ggplot(aes(x = Year, y = mean_depth)) +
-  geom_point(aes(color = `Lake Name`)) +
-  geom_line(aes(color = `Lake Name`)) +
-  geom_smooth(method = "lm", se = FALSE, color = "grey45", aes(group = 1)) +
-  facet_wrap(~`Lake Name`, labeller = labs, scales = "free") +
-  scale_x_continuous(breaks = scales::breaks_width(1)) +
-  scale_color_manual(values = lake_cols_raw) +
-  theme(legend.position = "none",
-        strip.text = element_text(size = 16),
-        strip.background = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ggtitle("Water transparency (1991-2022)") +
-  ylab("Secchi depth (m)")
+# Save plot in "plots" directory
+p_secchi
+ggsave(here("plots", "secchi_hhl.pdf"), width = 12, height = 6)
 ```
 
 Compare to two other monitored lakes in our township that have the most data:
@@ -189,11 +162,34 @@ p_secchi_other <-
 plot_grid(p_secchi + theme(axis.text.x = element_text(angle = 45, hjust = 1)), 
           p_secchi_other + theme(axis.text.x = element_text(angle = 45, hjust = 1)), 
           align = "h", axis = "t", nrow = 1, rel_widths = c(3, 2))
+ggsave(here("plots", "secchi_all.pdf"), width = 14, height = 6)
+```
+
+Run stats.
+
+```{r}
+# Linear model for data points
+lm(`Secchi Depth (m)` ~ Year, data = secchi %>% filter(`Lake Name` == "BIG HAWK LAKE")) %>% summary()
+lm(`Secchi Depth (m)` ~ Year, data = secchi %>% filter(`Lake Name` == "LITTLE HAWK LAKE")) %>% summary()
+lm(`Secchi Depth (m)` ~ Year, data = secchi %>% filter(`Lake Name` == "HALLS LAKE")) %>% summary()
+
+# lm(`Secchi Depth (m)` ~ Year, data = secchi_dat %>% filter(`Lake Name` == "BOSHKUNG LAKE")) %>% summary()
+lm(`Secchi Depth (m)` ~ Year, data = secchi_dat %>% filter(`Lake Name` == "KENNISIS LAKE")) %>% summary()
+lm(`Secchi Depth (m)` ~ Year, data = secchi_dat %>% filter(`Lake Name` == "KUSHOG LAKE")) %>% summary()
+```
+
+Calculate average clarity in each lake for each year.
+
+```{r}
+sum <- secchi %>% 
+  filter(`Lake Name` == "HALLS LAKE") %>% 
+  group_by(Year) %>% 
+  summarize(mean(`Secchi Depth (m)`))
 ```
 
 ### Water quality
 
-There are X metrics of water quality: pH levels, dissolved oxygen content, XXX
+There are three metrics of water quality: total phosphorus, calcium, and dissolved oxygen.
 
 Phosphorus data were obtained through the Lake Partner Program and are publicly available [here](https://data.ontario.ca/dataset/ontario-lake-partner/resource/1a36234b-3b97-451c-8965-0050e7f283cf).
 
@@ -244,6 +240,9 @@ p_phos <-
   ylab("Total phosphorus (µg/L)") +
   geom_hline(yintercept = 10, color = "darkred", linetype = "dashed")
 
+p_phos
+ggsave(here("plots", "phos_hhl.pdf"), width = 12, height = 6)
+
 # Plot Kushog and Kennisis Lakes as a comparison
 p_phos_kk <-
   phos_dat %>% 
@@ -269,10 +268,11 @@ p_phos_kk <-
 p_tp <- plot_grid(p_phos, p_phos_kk, align = "h", axis = "t", nrow = 1, rel_widths = c(3, 2))
 
 # Add common x axis to plot
-library(grid)
-library(gridExtra)
 x.grob <- textGrob("Year", gp = gpar(col = "black", fontsize = 16))
 grid.arrange(arrangeGrob(p_tp, bottom = x.grob))
+
+# Save plot
+ggsave(here("plots", "phos_all.pdf"), width = 14, height = 6)
 ```
 
 Plot only a single other lake:
@@ -422,6 +422,11 @@ p_calc <-
   ggtitle("Calcium levels (2008-2022)") +
   ylab("Calcium (mg/L)") +
   geom_hline(yintercept = 1.5, color = "darkred", linetype = "dashed")
+
+# Save plot
+p_calc
+ggsave(here("plots", "calc_hhl.pdf"), width = 12, height = 6)
+
 ```
 
 Build plot for Kushog and Kennisis Lakes.
@@ -453,12 +458,14 @@ p_calc_kk <-
   geom_hline(yintercept = 1.5, color = "darkred", linetype = "dashed")
 ```
 
-Panel both plots together.
+Panel both plots together and save.
 
 ```{r}
 p_c <- plot_grid(p_calc, p_calc_kk, align = "h", axis = "t", nrow = 1, rel_widths = c(3, 2))
-
 grid.arrange(arrangeGrob(p_c, bottom = x.grob))
+
+# Save plot
+ggsave(here("plots", "calc_all.pdf"), width = 14, height = 6)
 ```
 
 Run stats:
@@ -494,6 +501,7 @@ p_c_comb <- plot_grid(p_calc + scale_x_continuous(limits = c(2002, 2022)) + ggti
 
 p_comb <- plot_grid(p_tp_comb, p_c_comb, align = "h", axis = "t", nrow = 2)
 grid.arrange(arrangeGrob(p_comb, bottom = x.grob))
+ggsave(here("plots", "phoscalc_all.pdf"), width = 14, height = 8)
 ```
 
 #### Dissolved O2
@@ -501,8 +509,6 @@ grid.arrange(arrangeGrob(p_comb, bottom = x.grob))
 Import and tidy data.
 
 ```{r}
-lake_col_full <- lake_colors(full_names = TRUE)
-
 halls_disso <- read_tsv(here("data", "halls_water_chemistry.txt")) %>% 
   pivot_longer(cols = 4:20, names_to = "site_code", values_to = "value") %>% 
   # Average between replicates
@@ -534,52 +540,27 @@ disso <-
                                  str_detect(site_code_norep, regex("LHWK")) ~ "Little Hawk Lake"))
 ```
 
-Plot dissolved oxygen.
+We decided to not included the plotted dissolved oxygen as the data are so limited. But if you want to, uncomment below and run:
 
 ```{r}
-disso %>% 
-  filter(Parameter == "Diss_O2") %>% 
-  ggplot(aes(x = Year, y = avg_value)) +
-  geom_point(aes(color = `Lake Name`, group = Year), size = 3) +
-  # geom_boxplot(aes(color = `Lake Name`, group = Year)) +
-  geom_smooth(method = "lm", se = FALSE, color = "grey45", aes(group = 1)) +
-  facet_wrap(~`Lake Name`, scales = "free") +
-  scale_color_manual(values = lake_col_full) +
-  theme(legend.position = "none",
-        strip.text = element_text(size = 16),
-        strip.background = element_blank()) +
-  # scale_x_continuous(breaks = scales::breaks_width(5)) +
-  # scale_y_continuous(limits = c(0, 10), breaks = 0:10) +
-  ggtitle("Dissolved oxygen levels (2019-2024)") +
-  ylab("Dissolved O2 (mg/L)")
-```
-
-Make as a table instead.
-
-```{r}
-library(gt)
-library(gtExtras)
-
-disso %>%
-  filter(Parameter == "Diss_O2") %>% 
-  na.omit() %>% 
-  gt::gt() %>%
-  # gt_color_rows(avg_value, palette = c("white", "green"), domain = c(7, 11))
-  gtExtras::gt_hulk_col_numeric(avg_value, trim = TRUE, domain = c(7, 11))
-
-# Look at annual averages only
-disso %>% 
-  filter(Parameter == "Diss_O2") %>% 
-  na.omit() %>% 
-  group_by(`Lake Name`, Year) %>% 
-  mutate(`Annual average dissolved O2` = round(mean(avg_value), 2)) %>% 
-  dplyr::select(Year, `Lake Name`, `Annual average dissolved O2`) %>% 
-  distinct() %>% 
-  gt::gt() %>%
-  # gt_color_rows(avg_value, palette = c("white", "green"), domain = c(7, 11))
-  gtExtras::gt_hulk_col_numeric(`Annual average dissolved O2`, 
-                                trim = TRUE, 
-                                domain = c(7, 11))
+# disso %>% 
+#   filter(Parameter == "Diss_O2") %>% 
+#   ggplot(aes(x = Year, y = avg_value)) +
+#   geom_point(aes(color = `Lake Name`, group = Year), size = 3) +
+#   # geom_boxplot(aes(color = `Lake Name`, group = Year)) +
+#   geom_smooth(method = "lm", se = FALSE, color = "grey45", aes(group = 1)) +
+#   facet_wrap(~`Lake Name`, scales = "free") +
+#   scale_color_manual(values = lake_col_full) +
+#   theme(legend.position = "none",
+#         strip.text = element_text(size = 16),
+#         strip.background = element_blank()) +
+#   # scale_x_continuous(breaks = scales::breaks_width(5)) +
+#   # scale_y_continuous(limits = c(0, 10), breaks = 0:10) +
+#   ggtitle("Dissolved oxygen levels (2019-2024)") +
+#   ylab("Dissolved O2 (mg/L)")
+# 
+# # Save plot
+# ggsave(here("plots", "disso_hhl.pdf"), width = 12, height = 8)
 ```
 
 ### Benthic monitoring
@@ -617,6 +598,7 @@ indices <-
                                  str_detect(site_code_norep, regex("BHWK")) ~ "Big Hawk Lake",
                                  str_detect(site_code_norep, regex("LHWK")) ~ "Little Hawk Lake"))
 
+# Ranges for tolerances for each metric
 rect_data <- read_tsv(here("data", "index_rect_data.txt"))
 ```
 
@@ -640,6 +622,9 @@ indices %>%
   scale_y_continuous(limits = c(0, 1)) +
   ggtitle("Diversity (2020-2024)") +
   ylab("Simpson's diversity index")
+
+# Save plot
+ggsave(here("plots", "indices_hhl.pdf"), width = 12, height = 8)
 ```
 
 Run stats:
@@ -682,6 +667,9 @@ indices %>%
   scale_y_continuous(limits = c(0, 10)) +
   ggtitle("Pollution tolerance (2020-2024)") +
   ylab("Modified HBI (family level)")
+
+# Save plot
+ggsave(here("plots", "mHBI_hhl.pdf"), width = 12, height = 8)
 ```
 
 Run stats:
@@ -704,6 +692,17 @@ lm(avg_value ~ Year,
   summary() # coeff -0.1428, non sig
 ```
 
+Get averages for executive summary:
+
+```{r}
+indices %>% 
+  filter(Biotic_index == "mHBI") %>% 
+  # filter(`Lake Name` == "Halls Lake") %>% 
+  group_by(Year) %>% 
+  na.omit() %>% 
+  summarize(mean(avg_value))
+```
+
 #### Percent EOT
 
 ```{r}
@@ -723,6 +722,8 @@ indices %>%
       strip.background = element_blank()) +
   ggtitle("Diversity of pollution-intolerant groups (2020-2024)") +
   ylab("Percent EOT")
+
+ggsave(here("plots", "eot_hhl.pdf"), width = 12, height = 8)
 ```
 
 Run stats:
@@ -777,14 +778,26 @@ Build plots.
 veg %>% 
   ggplot(aes(x = Year, y = value, group = Vegetation_type, fill = Vegetation_type)) +
   geom_bar(stat = "identity", position = "stack") +
-  facet_grid(~`Lake Name`) +
-  theme(strip.text = element_text(size = 16),
-      strip.background = element_blank()) +
+  facet_grid(~`Lake Name`, scales = "free") +
+  theme(strip.text = element_text(size = 10, face = "bold"),
+        strip.background = element_blank(),
+        legend.text = element_text(size = 9),
+        legend.title = element_text(size = 10),
+        axis.title = element_text(size = 10),
+        axis.text.y = element_text(size = 9),
+        axis.text.x = element_text(size = 9, angle = 45, hjust = 1),
+        legend.position = "bottom") +
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(breaks = 2019:2024) +
-  scale_fill_manual(values = c("#206c24", "#208c74", "#704c14")) +
-  ggtitle("Algal growth (2019-2024)") +
-  ylab("Algal abundance, summed across sites")
+  # scale_fill_manual(values = c("#206c24", "#208c74", "#704c14")) +
+  scale_fill_manual(values = c("#596b36", "#a9cc68", "#fcf79b"), 
+                    name = "Type of algae") +
+  # ggtitle("Algal growth (2019-2024)") +
+  ylab("Abundance of algae")
+  # ylab("Algal abundance, summed across sites")
+
+# Save plot
+ggsave(here("plots", "algae_hhl.pdf"), width = 3.5, height = 3)
 ```
 
 Run stats.
@@ -808,92 +821,169 @@ lm(sum_algae ~ Year,
 
 The Trent Severn Waterway monitors lake levels for the HHPLOA lakes at two gauges: one at Hawk Lake Dam and the other at Buttermilk Falls. Data for the current year are available visually [here](https://www.pc.gc.ca/apps/WaterLevels/?siteId=100419&lat=44.71941044950733&lng=-78.7716293334961&z=9&_ga=2.155594553.368853008.1747062876-2016780462.1742352049&_gl=1*1u88omb*_ga*MjAxNjc4MDQ2Mi4xNzQyMzUyMDQ5*_ga_PC690N3X7Z*czE3NDcwNjc0MjYkbzMkZzAkdDE3NDcwNjc0MjYkajAkbDAkaDA.) and for previous years through the Coalition for Equitable Water Flow [here](https://www.cewf.ca/archives/water-level-summaries).
 
+Because raw data are not provided at the links above, we obtained the full dataset (monthly levels from 1988-2025) by contacting Trent-Severn directly.
 
-### For 2024
+### Lake levels
 
-I digitized the 2024 plot data using plotDigitizer. Import the data:
+Look at lake levels for 2024.
 
 ```{r}
 levels <- read_tsv(here("data", "lake_levels.txt"))
 levels$Date <- lubridate::mdy(levels$Date)
 levels <- levels %>% 
-  mutate("Year" = year(Date)) %>% 
-  filter(Year == 2024)
+  mutate("Year" = year(Date),
+         "DOY" = yday(Date))
+# There's only a single observation for 2010 for Hawk Lake so we'll remove it
+levels <- levels %>% 
+  filter(!(Year == 2010 & Lake == "Hawk"))
+
+# Calculate monthly min, max, and average across all years
+summary <- levels %>% 
+  group_by(Lake, DOY) %>% 
+  summarize(Average = mean(`Water level (m)`),
+            Maximum = max(`Water level (m)`),
+            Minimum = min(`Water level (m)`))
+
+doy_months <- read_tsv(here("data", "DOY_months.txt"))
 ```
 
-Make the plot for Hawk Lakes.
-
-```{r}
-# TODO add gridlines!
-ggplot() +
-  geom_line(data = levels %>% 
-              filter(Lake == "Hawk") %>% 
-              filter(Statistic != "Specific_year"), 
-            aes(x = Date, y = Level, group = Statistic, color = Statistic), 
-            linewidth = 1, alpha = 0.5) +
-  geom_line(data = levels %>% 
-              filter(Lake == "Hawk") %>% 
-              filter(Statistic == "Specific_year"), 
-            aes(x = Date, y = Level, group = Statistic, color = Statistic), 
-            linewidth = 1) +
-  ylab("Water level (m)") +
-  scale_color_manual(values = c("Specific_year" = "#58ae50", "Minimum" = "#bd724b", "Maximum" = "goldenrod1", "Average" = "#e0840c")) +
-  scale_x_date(date_breaks = "1 month") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ggtitle("Lake levels at Hawk Lake Dam (2024)")
-```
-
-Make the plot for Halls Lake.
+Build the plot for 2024 for Hawk Lake Dam.
 
 ```{r}
 ggplot() +
+  # Add month bars
+  geom_rect(data = doy_months %>% 
+              filter(Month %in% c("Jan", "Mar", "May", "Jul", "Sep", "Nov")), 
+            aes(xmin = Start, xmax = End, 
+                ymin = 1.5, ymax = 5),
+            fill = "grey", alpha = 0.5) +
+  # Add min and max levels
+  geom_ribbon(data = summary %>% 
+                filter(Lake == "Hawk"),
+              aes(x = DOY, ymin = Minimum, ymax = Maximum), 
+              fill = "dodgerblue1", alpha = 0.5) +
+  # Add average over all years
+  geom_line(data = summary %>% 
+              filter(Lake == "Hawk"),
+            aes(x = DOY, y = Average), 
+            color = "dodgerblue1", linetype = "dashed", linewidth = 1) +
+  # Add 2024 data only
   geom_line(data = levels %>% 
-              filter(Lake == "Halls") %>% 
-              filter(Statistic != "Specific_year"), 
-            aes(x = Date, y = Level, group = Statistic, color = Statistic), 
-            linewidth = 1, alpha = 0.5) +
-  geom_line(data = levels %>% 
-              filter(Lake == "Halls") %>% 
-              filter(Statistic == "Specific_year"), 
-            aes(x = Date, y = Level, group = Statistic, color = Statistic), 
+              filter(Year == 2024) %>% 
+              filter(Lake == "Hawk"), 
+            aes(x = DOY, y = `Water level (m)`, group = Lake, color = Lake), 
             linewidth = 1) +
   ylab("Water level (m)") +
-  scale_color_manual(values = c("Specific_year" = "#448cbc", "Minimum" = "#bd724b", "Maximum" = "goldenrod1", "Average" = "#e0840c")) +
-  scale_x_date(date_breaks = "1 month") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ggtitle("Lake levels at Halls Lake (2024)")
+  xlab("Day of the Year") +
+  theme(panel.grid.major.y = element_line(linewidth = 0.5, linetype = "dashed", color = "grey")) +
+  ggtitle("Lake levels at Hawk Lake Dam (2024)") +
+  theme(legend.position = "none") +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0))
+
+# Save plot
+ggsave(here("plots", "levels_hawk.pdf"), width = 10, height = 6)
 ```
 
-### Lake level fluctuations
+Build the plot for 2024 for Halls Lake Dam.
+
+```{r}
+ggplot() +
+  # Add month bars
+  geom_rect(data = doy_months %>% 
+              filter(Month %in% c("Jan", "Mar", "May", "Jul", "Sep", "Nov")), 
+            aes(xmin = Start, xmax = End, 
+                ymin = 1.25, ymax = 3.1),
+            fill = "grey", alpha = 0.5) +
+  # Add min and max levels
+  geom_ribbon(data = summary %>% 
+                filter(Lake == "Halls"),
+              aes(x = DOY, ymin = Minimum, ymax = Maximum), 
+              fill = "dodgerblue1", alpha = 0.5) +
+  # Add average over all years
+  geom_line(data = summary %>% 
+              filter(Lake == "Halls"),
+            aes(x = DOY, y = Average), 
+            color = "dodgerblue1", linetype = "dashed", linewidth = 1) +
+  # Add 2024 data only
+  geom_line(data = levels %>% 
+              filter(Year == 2024) %>% 
+              filter(Lake == "Halls"), 
+            aes(x = DOY, y = `Water level (m)`, group = Lake, color = Lake), 
+            linewidth = 1) +
+  ylab("Water level (m)") +
+  xlab("Day of the Year") +
+  theme(panel.grid.major.y = element_line(linewidth = 0.5, linetype = "dashed", color = "grey")) +
+  ggtitle("Lake levels at Halls Lake Dam (2024)") +
+  theme(legend.position = "none") +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0))
+
+# Save plot
+ggsave(here("plots", "levels_halls.pdf"), width = 10, height = 6)
+```
+
+What time of year do min/max occur?
+
+```{r}
+min_time_of_year <- 
+  levels %>% 
+  mutate(Month = month(Date)) %>% 
+  group_by(Lake, Year) %>% 
+  filter(`Water level (m)` == min(`Water level (m)`)) %>% 
+  dplyr::select(Lake, Year, Month) %>% 
+  distinct()
+max_time_of_year <- 
+  levels %>% 
+  mutate(Month = month(Date)) %>% 
+  group_by(Lake, Year) %>% 
+  filter(`Water level (m)` == max(`Water level (m)`)) %>% 
+  dplyr::select(Lake, Year, Month) %>% 
+  distinct()
+
+min_time_of_year %>% 
+  ggplot(aes(x = Month)) +
+  geom_bar(stat = "count", aes(fill = Lake)) +
+  # scale_fill_manual(values = c("#448cbc", "#58ae50"))
+  facet_grid(~Lake) +
+  scale_x_continuous(breaks = 1:12)
+max_time_of_year %>% 
+  ggplot(aes(x = Month)) +
+  geom_bar(stat = "count", aes(fill = Lake)) +
+  # scale_fill_manual(values = c("#448cbc", "#58ae50"))
+  facet_grid(~Lake) +
+  scale_x_continuous(breaks = 1:12)
+```
+
+### Fluctuations
 
 Amount of annual fluctuation is the maximum lake level minus the minimum lake level.
 
-Import the data:
+Calculate fluctuations using the levels data for each year:
 
 ```{r}
-fluct <- read_tsv(here("data", "lake_fluctuations.txt"))
-fluct$Date <- lubridate::mdy(fluct$Date)
-fluct <- fluct %>% 
-  mutate("Year" = year(Date)) %>% 
+fluct <- levels %>% 
+  ungroup() %>% 
   group_by(Lake, Year) %>% 
-  dplyr::select(-Date) %>% 
-  pivot_wider(names_from = Statistic, values_from = Level) %>% 
-  mutate("Fluctuation" = Maximum-Minimum)
+  summarize(minimum = min(`Water level (m)`),
+            maximum = max(`Water level (m)`),
+            fluctuation = maximum-minimum)
 ```
 
 Plot the data:
 
 ```{r}
+fluct$Year <- as.character(fluct$Year)
+
 # Plot the range of values:
 fluct %>% 
-  # filter(Lake == "Hawk") %>% 
   ggplot() +
-  geom_segment(aes(x = Year, xend = Year, y = Minimum, yend = Maximum, color = Lake), 
-               linewidth = 20) +
-  geom_line(aes(x = Year, y = Fluctuation), color = "black") +
-  geom_point(aes(x = Year, y = Fluctuation), pch = 21, size = 4, 
+  geom_segment(aes(x = Year, xend = Year, y = minimum, yend = maximum, color = Lake), 
+               linewidth = 10, alpha = 0.75) +
+  geom_line(aes(x = Year, y = fluctuation, group = 1), color = "black") +
+  geom_point(aes(x = Year, y = fluctuation), pch = 21, size = 4, 
              color = "black", fill = "white") +
-  scale_x_continuous(breaks = 2013:2024) +
+  # scale_x_continuous(breaks = 2013:2024) +
   ylab("Lake level (m)") +
   ggtitle("Lake level fluctuations (2013-2024)") +
   facet_wrap(~Lake,
@@ -904,7 +994,11 @@ fluct %>%
   theme(legend.position = "none",
         strip.background = element_blank(),
         strip.text = element_text(size = 14),
-        panel.grid.major.y = element_line(linewidth = 0.5, linetype = "dashed", color = "grey"))
+        panel.grid.major.y = element_line(linewidth = 0.5, linetype = "dashed", color = "grey"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Save plot
+ggsave(here("plots", "fluct_hhl.pdf"), width = 12, height = 8)
 ```
 
 Run statistics:
@@ -938,11 +1032,57 @@ fluct %>%
   filter(min(Minimum), max(Maximum))
 ```
 
-## Maps
 
-5)  Nice data viz of Trent-Severn waterway
-6)  Possibly also a higher resolution map of our watershed (the one in the 2006 summary is really low resolution) Based on results from analyses above, I will also fact-check any claims made in the summary (e.g., statements about the acidification of Little Hawk, etc.)
+## Map of Ontario
 
-## Other analyses
+The following map was downloaded using Ontario GeoHub and is a cropped version of the Ontario Land Cover Compilation v2.0, available [here](https://www.arcgis.com/home/item.html?id=7aa998fdf100434da27a41f1c637382c).
 
-1) Algae growth 2) Bacterial levels 3) If a trend is found with ice out dates, look into finding data 4) Lake health comparison to other lakes in the area
+```{r}
+tsw <- read_tsv(here("data", "TSW_coords.txt"))
+# map <- terra::rast(here("data", "OLCC_V2_TIFF", "OLCC_V2_TIFF.tif"))
+# newcrs = "+proj=longlat +datum=WGS84"
+# newmap <- terra::project(map, newcrs)
+# bounds <- terra::ext(-78.861312, -78.299532, 44.650277, 45.259690)
+# subset <- terra::crop(newmap, bounds)
+# # Save cropped object
+# terra::writeRaster(subset, here("data", "ontario_map.tif"))
+
+subset <- terra::rast(here("data", "ontario_map.tif"))
+
+pal = c("#844836", "#b07156", "#b99364", "#dac3a9", "#8fa997") # , "#6baeb0", "#376988"
+palette = grDevices::colorRampPalette(pal)(100)
+palette <- rev(palette)
+
+# dat <- terra::as.data.frame(subset, xy = TRUE)
+
+unique(dat$OLCC_V2_TIFF)
+subset[subset == 247] <- NA
+
+# TODO add manual coloration in here
+ggplot() +
+  geom_spatraster(data = subset) +
+  # scale_fill_gradientn(colors = palette, na.value = NA) +
+  theme_map() +
+  geom_path(data = tsw %>% filter(Type == "Dam" | Type == "Lake"),
+             aes(x = Longitude, y = Latitude, group = Headwater, 
+                 color = Headwater), linewidth = 0.5) +
+  geom_point(data = tsw %>% filter(Type == "Dam" | Type == "Lake"),
+             aes(x = Longitude, y = Latitude, color = Type), size = 2) +
+  geom_point(data = tsw %>% filter(Type == "City") %>% filter(Name != "Dorset"),
+             aes(x = Longitude, y = Latitude), color = "white", fill = "black", pch = 21) +
+  geom_text(data = tsw %>% filter(Type == "City") %>% filter(Name != "Dorset"),
+             aes(x = Longitude, y = Latitude, label = Name), 
+            hjust = -0.1, vjust = 0.75, color = "white", size = 3) +
+  # Add 'headwater' lake labels in
+  geom_label(data = tsw %>% filter(Name == "Kennisis Lake" | Name == "Percy Lake" | 
+                                     Name == "Redstone Lake" | Name == "Sherborne Lake" |
+                                     Name == "Little Brother Lake" | Name == "Bob Lake"),
+             aes(x = Longitude, y = Latitude, label = Name, color = Name), 
+             size = 3, hjust = 0.5, vjust = -0.5) +
+  # Add our lake names in
+  geom_label(data = tsw %>% filter(Name == "Big Hawk Lake" | Name == "Little Hawk Lake" | 
+                                     Name == "Halls Lake"),
+             aes(x = Longitude, y = Latitude, label = Name, color = Name), 
+             size = 4, hjust = 0.5, vjust = -0.5)
+```
+

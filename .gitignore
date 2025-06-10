@@ -49,3 +49,7 @@ po/*~
 rsconnect/
 .DS_Store
 data/~$benthic_monitoring_data.xlsx
+
+# Large map files
+*.tif
+data/OLCC_V2_TIFF/*

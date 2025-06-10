@@ -1,0 +1,4 @@
+Type	Name	Short_name	Headwater	Latitude	Longitude	Ordering	Font_type
+Lake	Big Hawk Lake	Big Hawk	Kennisis	45.16073	-78.737747	7	Bold
+Lake	Halls Lake	Halls	Kennisis	45.109396	-78.747367	9	Bold
+Lake	Little Hawk Lake	Little Hawk	NA	45.150688	-78.707872	3	Bold

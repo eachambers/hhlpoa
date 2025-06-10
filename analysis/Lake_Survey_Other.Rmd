@@ -1,0 +1,296 @@
+---
+title: "Lake Survey Other"
+author: "Anne Chambers"
+date: "2025-05-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Categorize questions: NATURE
+nature <- dat %>% 
+  dplyr::select(Lake:Minimize_Water_Fluctuations) %>%
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Preserve_Natural_Beauty:Minimize_Water_Fluctuations, 
+               names_to = "question", values_to = "response") %>% 
+  na.omit() %>% 
+  group_by(respondent) %>% 
+  mutate(nature_mean = mean(response))
+
+# DEVELOPMENT
+devmt <- dat %>% 
+  dplyr::select(Lake:Access, Condominiums:Enforcement_for_upkeep_of_waste_systems) %>%
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Condominiums:Enforcement_for_upkeep_of_waste_systems, 
+               names_to = "question", values_to = "response") %>% 
+  na.omit() %>% 
+  group_by(respondent) %>% 
+  mutate(devmt_mean = mean(response))
+
+# LEGISLATION
+legtn <- dat %>% 
+  dplyr::select(Lake:Access, Lower_speeds_in_open_water:Invasive_species_checks) %>%
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Lower_speeds_in_open_water:Invasive_species_checks, 
+               names_to = "question", values_to = "response") %>% 
+  na.omit() %>% 
+  group_by(respondent) %>% 
+  mutate(legtn_mean = mean(response))
+
+# LAKE USE
+lake_use <- dat %>% 
+  dplyr::select(Lake:Access, Construction_of_water_ski_courses:Pollution_from_campsites) %>%
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Construction_of_water_ski_courses:Pollution_from_campsites, 
+               names_to = "question", values_to = "response") %>% 
+  na.omit() %>% 
+  group_by(respondent) %>% 
+  mutate(use_mean = mean(response))
+
+# AMENITIES
+amenities <- dat %>% 
+  dplyr::select(Lake:Access, Frequency_of_O.P.P._marine_patrols:Number_of_public_beaches) %>%
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Frequency_of_O.P.P._marine_patrols:Number_of_public_beaches, 
+               names_to = "question", values_to = "response") %>% 
+  na.omit() %>% 
+  group_by(respondent) %>% 
+  mutate(amen_mean = mean(response))
+```
+
+# Run LMs and plot
+
+### Nature
+
+Most interesting relationships are those between nature-based responses and age of respondent as well as type of property access.
+
+```{r}
+lmfit_age_nat <- lm(nature_mean ~ Age, data = nature)
+lmfit_acc_nat <- lm(nature_mean ~ Access, data = nature)
+lm(nature_mean ~ Age, data = nature) %>% summary()
+lm(nature_mean ~ Access, data = nature) %>% summary() # Private cares most, water cares least
+
+# lm(nature_mean ~ Lake, data = nature) %>% summary() # Saskatchewan Lake a bit sig lower (but n=1)
+# lm(nature_mean ~ Duration, data = nature) %>% summary() # Shorter durations == care more but only sig for longest duration (and not a lot)
+```
+
+Build interaction plots:
+
+```{r}
+# For age
+p_age_nature <-
+  interactions::cat_plot(lmfit_age_nat, pred = Age, modx = Age, 
+                                       colors = c("#208c74", "#a82c94", "#bd724b"),
+                                       y.label = "Mean nature response",
+                                       main.title = "Age as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 3, y = 4.7, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 1, y = 5.01, label = "***", size = 8, color = "black") +
+  scale_y_continuous(limits = c(4.4, 5.1))
+
+# For access
+p_acc_nature <-
+  interactions::cat_plot(lmfit_acc_nat, pred = Access, modx = Access, 
+                                       colors = c("goldenrod1", "#704c14", "#186484"),
+                                       y.label = "Mean nature response",
+                                       main.title = "Access as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 4.6, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 4.7, label = "**", size = 8, color = "black")
+
+plot_grid(p_age_nature, p_acc_nature, nrow = 2)
+ggsave(here("plots", "lake_survey_nature.pdf"), width = 4, height = 6)
+```
+
+Plotting the results using ggplot is a little harder to interpret.
+
+```{r}
+nature %>% 
+  dplyr::select(Lake:Access, nature_mean) %>% 
+  distinct() %>% 
+  pivot_longer(cols = Lake:Access, names_to = "category", values_to = "value") %>%
+  ggplot(aes(x = value, y = nature_mean)) +
+  geom_boxplot(aes(color = value, group = value)) +
+  stat_summary(fun = mean, geom = "point", shape = 21, size = 6, color = "black", fill = "white") +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 16),
+        strip.background = element_blank()) +
+  facet_wrap(~category, labeller = labs, scales = "free") +
+  ylab("Mean nature response") +
+  ggtitle("Nature-related questions")
+```
+
+### Development
+
+```{r}
+lmfit_dur_dev <- lm(devmt_mean ~ Duration, data = devmt)
+lmfit_acc_dev <- lm(devmt_mean ~ Access, data = devmt)
+
+lm(devmt_mean ~ Duration, data = devmt) %>% summary() # very sig, all ***, int. XXX
+lm(devmt_mean ~ Access, data = devmt) %>% summary() # public access cares the least, private the most
+
+# lm(devmt_mean ~ Age, data = devmt) %>% summary()
+# lm(devmt_mean ~ Lake, data = devmt) %>% summary()
+```
+
+Build interaction plots:
+
+```{r}
+p_dur_dev <-
+  interactions::cat_plot(lmfit_dur_dev, pred = Duration, modx = Duration, 
+                                       colors = "Dark2",
+                                       y.label = "Mean development response",
+                                       main.title = "Duration as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 3.5, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 3.7, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 4, y = 3.7, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 5, y = 3.65, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 6, y = 3.5, label = "***", size = 8, color = "black") +
+  scale_y_continuous(limits = c(2.5, 3.75))
+
+# For access, same pattern as with nature
+p_acc_dev <-
+  interactions::cat_plot(lmfit_acc_dev, pred = Access, modx = Access, 
+                                       colors = c("goldenrod1", "#704c14", "#186484"),
+                                       y.label = "Mean development response",
+                                       main.title = "Access as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 3.4, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 3.61, label = "***", size = 8, color = "black")
+
+plot_grid(p_dur_dev, p_acc_dev, nrow = 2)
+ggsave(here("plots", "lake_survey_development.pdf"), width = 4, height = 6)
+```
+
+### Legislation
+
+```{r}
+lmfit_age_legtn <- lm(legtn_mean ~ Age, data = legtn)
+lmfit_dur_legtn <- lm(legtn_mean ~ Duration, data = legtn)
+
+lm(legtn_mean ~ Age, data = legtn) %>% summary() # int middle; both ***
+lm(legtn_mean ~ Duration, data = legtn) %>% summary() # int 0-1; all ***; 1-14 least followed by 7+ months
+
+# lm(legtn_mean ~ Lake, data = legtn) %>% summary()
+# lm(legtn_mean ~ Access, data = legtn) %>% summary()
+```
+
+Build interaction plots:
+
+```{r}
+p_age_legtn <-
+  interactions::cat_plot(lmfit_age_legtn, pred = Age, modx = Age, 
+                                       colors = c("#208c74", "#a82c94", "#bd724b"),
+                                       y.label = "Mean legislation response",
+                                       main.title = "Age as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 4.3, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 4.4, label = "***", size = 8, color = "black") +
+  scale_y_continuous(limits = c(3.5, 4.5))
+
+# For access, same pattern as with nature
+p_dur_legtn <-
+  interactions::cat_plot(lmfit_dur_legtn, pred = Duration, modx = Duration, 
+                                       colors = "Dark2",
+                                       y.label = "Mean legislation response",
+                                       main.title = "Duration as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 4.2, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 4.2, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 4, y = 4.4, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 5, y = 4.2, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 6, y = 4.1, label = "***", size = 8, color = "black")
+
+plot_grid(p_age_legtn, p_dur_legtn, nrow = 2)
+ggsave(here("plots", "lake_survey_legislation.pdf"), width = 4, height = 6)
+```
+
+### Lake Use
+
+```{r}
+lmfit_age_lakeuse <- lm(use_mean ~ Age, data = lake_use)
+lmfit_acc_lakeuse <- lm(use_mean ~ Access, data = lake_use)
+
+lm(use_mean ~ Age, data = lake_use) %>% summary() # int. middle; all ***
+lm(use_mean ~ Access, data = lake_use) %>% summary() # int. private; all ***
+
+# lm(use_mean ~ Lake, data = lake_use) %>% summary()
+# lm(use_mean ~ Duration, data = lake_use) %>% summary()
+```
+
+Build interaction plots:
+
+```{r}
+p_age_lakeuse <-
+  interactions::cat_plot(lmfit_age_lakeuse, pred = Age, modx = Age, 
+                                       colors = c("#208c74", "#a82c94", "#bd724b"),
+                                       y.label = "Mean lake use response",
+                                       main.title = "Age as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 4.1, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 4.1, label = "***", size = 8, color = "black") +
+  scale_y_continuous(limits = c(3.1, 4.2))
+
+# For access, same pattern as with nature
+p_acc_lakeuse <-
+  interactions::cat_plot(lmfit_acc_lakeuse, pred = Access, modx = Access, 
+                                       colors = c("goldenrod1", "#704c14", "#186484"),
+                                       y.label = "Mean lake use response",
+                                       main.title = "Access as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 3.95, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 3.9, label = "***", size = 8, color = "black")
+
+plot_grid(p_age_lakeuse, p_acc_lakeuse, nrow = 2)
+ggsave(here("plots", "lake_survey_lakeuse.pdf"), width = 4, height = 6)
+```
+
+### Amenities
+
+```{r}
+lm(amen_mean ~ Age, data = amenities) %>% summary()
+lm(amen_mean ~ Lake, data = amenities) %>% summary() # <--- some sig.
+lm(amen_mean ~ Duration, data = amenities) %>% summary() # all sig
+lm(amen_mean ~ Access, data = amenities) %>% summary() # only water sig
+```
+
+Build interaction plots:
+
+```{r}
+p_age_lakeuse <-
+  interactions::cat_plot(lmfit_age_lakeuse, pred = Age, modx = Age, 
+                                       colors = c("#208c74", "#a82c94", "#bd724b"),
+                                       y.label = "Mean lake use response",
+                                       main.title = "Age as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 4.1, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 4.1, label = "***", size = 8, color = "black") +
+  scale_y_continuous(limits = c(3.1, 4.2))
+
+# For access, same pattern as with nature
+p_acc_lakeuse <-
+  interactions::cat_plot(lmfit_acc_lakeuse, pred = Access, modx = Access, 
+                                       colors = c("goldenrod1", "#704c14", "#186484"),
+                                       y.label = "Mean lake use response",
+                                       main.title = "Access as a predictor",
+                                       point.size = 0.5) +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = 2, y = 3.95, label = "***", size = 8, color = "black") +
+  annotate(geom = "text", x = 3, y = 3.9, label = "***", size = 8, color = "black")
+
+plot_grid(p_age_lakeuse, p_acc_lakeuse, nrow = 2)
+ggsave(here("plots", "lake_survey_lakeuse.pdf"), width = 4, height = 6)
+```

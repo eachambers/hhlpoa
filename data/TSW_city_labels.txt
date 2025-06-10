@@ -1,0 +1,6 @@
+Type	Name	Short name	Headwater	Latitude	Longitude	Ordering
+City	Coboconk	Coboconk	NA	44.660416	-78.802051	NA
+City	Minden	Minden	NA	44.924838	-78.72436	NA
+City	Haliburton	Haliburton	NA	45.04664	-78.50823	NA
+City	Dorset	Dorset	NA	45.24647	-78.893581	NA
+City	West Guilford	West Guilford	NA	45.113002	-78.603004	NA

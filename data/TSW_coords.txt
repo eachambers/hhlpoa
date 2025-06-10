@@ -1,0 +1,65 @@
+Type	Name	Short name	Headwater	Latitude	Longitude	Ordering
+Lake	Kennisis Lake	Kennisis	Kennisis	45.215914	-78.639773	1
+Dam	Kennisis Lake Dam	Little Kennisis	Kennisis	45.215328	-78.663418	2
+Lake	Red Pine Lake	Red Pine	Kennisis	45.204788	-78.702405	3
+Dam	Red Pine Lake Dam	Paint	Kennisis	45.211039	-78.715122	4
+Lake	Nunikani Lake	Nunikani	Kennisis	45.199114	-78.736931	5
+Dam	Nunikani Lake Dam	Crab	Kennisis	45.184821	-78.744696	6
+Lake	Big Hawk Lake	Big Hawk	Kennisis	45.16073	-78.737747	7
+Dam	Big Hawk Lake Dam	Hawk	Kennisis	45.142499	-78.742962	8
+Lake	Halls Lake	Halls	Kennisis	45.109396	-78.747367	9
+Dam	Halls Lake Dam	Halls	Kennisis	45.095433	-78.745953	10
+Lake	Boshkung Lake	Boshkung	Kennisis	45.063605	-78.728593	11
+Lake	Little Boshkung Lake	Little Boshkung	Kennisis	45.038253	-78.719442	12
+Lake	Twelve Mile Lake	Twelve Mile	Kennisis	45.024988	-78.704789	13
+Dam	Twelve Mile Lake Dam	Twelve Mile	Kennisis	45.002174	-78.702643	14
+Lake	Mountain Lake	Mountain	Kennisis	44.990569	-78.703699	15
+Lake	Horseshoe Lake	Horseshoe	Kennisis	44.989627	-78.676815	16
+Dam	Horseshoe Lake Dam	Horseshoe	Kennisis	44.967652	-78.683176	17
+Lake	Gull Lake	Gull	Kennisis	44.848805	-78.779607	18
+Dam	Gull Lake Dam #1	Gull #1	Kennisis	44.806147	-78.803158	19
+Dam	Gull Lake Dam #2	Gull #2	Kennisis	44.805693	-78.802921	19
+Lake	Moore Lake	Moore	Kennisis	44.796807	-78.808018	20
+Dam	Moore Lake Dam	Elliott's Falls	Kennisis	44.742704	-78.8252	21
+Dam	Norland Dam	Norland	Kennisis	44.728724	-78.810357	22
+Lake	Shadow Lake	Shadow	Kennisis	44.71762	-78.79198	23
+Lake	Silver Lake	Silver	Kennisis	44.684593	-78.79959	24
+Dam	Coboconk Dam	Coboconk	Kennisis	44.659515	-78.796978	25
+Lake	Sherborne Lake	Sherborne	Sherborne	45.17675	-78.784641	1
+Dam	Sherborne Lake Dam	Trout	Sherborne	45.170861	-78.813952	2
+Lake	St. Nora Lake	St. Nora	Sherborne	45.158513	-78.829206	3
+Lake	Kushog Lake	Kushog	Sherborne	45.121064	-78.817667	4
+Dam	Kushog Lake Dam	Kashagawi	Sherborne	45.052861	-78.752439	5
+Lake	Boshkung Lake	Boshkung	Sherborne	45.063605	-78.728593	6
+Lake	Bob Lake	Bob	Bob	44.915326	-78.785481	1
+Dam	Bob Lake Dam	Big Bob	Bob	44.89284	-78.790693	2
+Lake	Little Bob Lake	Little Bob	Bob	44.878259	-78.788044	3
+Dam	Little Bob Lake Dam	Little Bob	Bob	44.865833	-78.778652	4
+Lake	Gull Lake	Gull	Bob	44.848805	-78.779607	5
+Lake	Redstone Lake	Redstone	RedstoneEast	45.19393	-78.538786	1
+Dam	Redstone Lake East Dams 2&3	Redstone East	RedstoneEast	45.163868	-78.500431	2
+Lake	Eagle Lake	Eagle	RedstoneEast	45.137312	-78.490974	3
+Lake	Redstone Lake	Redstone	RedstoneWest	45.19393	-78.538786	1
+Dam	Redstone Lake West Dam	Redstone West	RedstoneWest	45.161115	-78.555568	2
+Lake	Maple Lake	Maple	RedstoneWest	45.096403	-78.670597	3
+Lake	Percy Lake	Percy	Percy	45.200635	-78.353702	1
+Dam	Percy Lake Dam	Percy	Percy	45.207935	-78.385565	2
+Lake	Haliburton Lake	Haliburton	Percy	45.193617	-78.39457	3
+Lake	Oblong Lake	Oblong	Percy	45.179078	-78.43377	4
+Dam	Oblong Lake Dam	Oblong	Percy	45.1727	-78.441626	5
+Lake	Moose Lake	Moose	Percy	45.148952	-78.462726	6
+Lake	Eagle Lake	Eagle	Percy	45.137312	-78.490974	7
+Dam	Eagle Lake Dam	Eagle	Percy	45.128772	-78.508038	8
+Lake	Cranberry Lake	Cranberry	Percy	45.125859	-78.557022	9
+Lake	Pine Lake	Pine	Percy	45.114692	-78.58914	10
+Lake	Green Lake	Green	Percy	45.112173	-78.619551	11
+Lake	Maple Lake	Maple	Percy	45.096403	-78.670597	12
+Lake	Beech Lake	Beech	Percy	45.077233	-78.694181	13
+Lake	Little Brother Lake	Little Brother	Little Brother	45.133052	-78.760549	1
+Dam	Little Brother Lake Dam	Mud	Little Brother	45.130808	-78.759525	2
+Lake	Halls Lake	Halls	Little Brother	45.109396	-78.747367	3
+City	Coboconk	Coboconk	NA	44.660416	-78.802051	NA
+City	Minden	Minden	NA	44.924838	-78.72436	NA
+City	Haliburton	Haliburton	NA	45.04664	-78.50823	NA
+City	Dorset	Dorset	NA	45.24647	-78.893581	NA
+City	West Guilford	West Guilford	NA	45.113002	-78.603004	NA

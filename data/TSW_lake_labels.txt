@@ -1,0 +1,13 @@
+Type	Name	Short_name	Headwater	Latitude	Longitude	Ordering	Font_type
+Lake	Kennisis Lake	Kennisis	Kennisis	45.215914	-78.639773	1	Regular
+Lake	Red Pine Lake	Red Pine	Kennisis	45.204788	-78.702405	3	Regular
+Lake	Nunikani Lake	Nunikani	Kennisis	45.199114	-78.736931	5	Regular
+Lake	Sherborne Lake	Sherborne	Sherborne	45.17675	-78.784641	1	Regular
+Lake	Little Brother Lake	Little Brother	Little Brother	45.133052	-78.760549	1	Regular
+Lake	Boshkung Lake	Boshkung	Kennisis	45.063605	-78.728593	11	Regular
+Lake	Maple Lake	Maple	RedstoneWest	45.096403	-78.670597	3	Regular
+Lake	Kushog Lake	Kushog	Sherborne	45.121064	-78.817667	4	Regular
+Lake	Clear Lake	Clear	NA	45.182353	-78.713673	NA	Regular
+Lake	Cat Lake	Cat	NA	45.177538	-78.679097	NA	Regular
+Lake	Buckhorn Lake	Buckhorn	NA	45.241424	-78.695062	NA	Regular
+Lake	Big Brother Lake	Big Brother	Big Brother	45.139095	-78.769948	NA	Regular
