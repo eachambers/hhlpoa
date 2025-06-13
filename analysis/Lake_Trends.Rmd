@@ -49,15 +49,21 @@ Build plot:
 ice %>% 
   group_by(Year, Month) %>% 
   ggplot(aes(x = Year, y = doy, group = 1)) +
-  geom_point(size = 3, color = lake_cols[["bighawk"]]) +
-  geom_line(linewidth = 1, color = lake_cols[["bighawk"]]) +
-  geom_smooth(method = 'lm', se = F, color = "grey40")+
-  ylab("Day of the year") +
+  # geom_point(size = 3, color = lake_cols[["bighawk"]]) +
+  # geom_line(linewidth = 1, color = lake_cols[["bighawk"]]) +
+  geom_point(size = 2, color = "#b4d6e7") +
+  geom_line(linewidth = 1, color = "#b4d6e7") +
+  geom_smooth(method = 'lm', se = F, color = "#186484") +
+  # ylab("Day of the year") +
+  ylab("Ice out date") +
   scale_x_continuous(breaks = scales::breaks_width(5)) +
-  ggtitle("Ice-out dates for Big Hawk Lake (1968-2025)")
+  # ggtitle("Ice-out dates for Big Hawk Lake (1968-2025)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12))
 
 # Save plot in "plots" directory
-ggsave(here("plots", "ice_out.pdf"), width = 10, height = 6)
+ggsave(here("plots", "ice_out.pdf"), width = 3.5, height = 2.5)
 ```
 
 Find earliest and latest ice-out dates:
@@ -789,9 +795,10 @@ veg %>%
         legend.position = "bottom") +
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(breaks = 2019:2024) +
-  # scale_fill_manual(values = c("#206c24", "#208c74", "#704c14")) +
-  scale_fill_manual(values = c("#596b36", "#a9cc68", "#fcf79b"), 
+  scale_fill_manual(values = c("#186484", "#448cbc", "#b4d6e7"),
                     name = "Type of algae") +
+  # scale_fill_manual(values = c("#596b36", "#a9cc68", "#fcf79b"), 
+  #                   name = "Type of algae") +
   # ggtitle("Algal growth (2019-2024)") +
   ylab("Abundance of algae")
   # ylab("Algal abundance, summed across sites")

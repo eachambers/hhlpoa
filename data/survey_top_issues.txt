@@ -1,0 +1,214 @@
+Unique ID	Member	Lake	Time per year	Age	Top_11_enviro_issues				
+H4509	Yes	Halls Lake	2 - 3 months	56 + years old	1b	1f	1h	2b	2c
+H6921	Yes	Halls Lake	2 - 3 months	56 + years old	2a	2b	2c		
+H4960	Yes	Halls Lake	4 - 6 months	56 + years old	2d	2a	1e	1b	1a
+K6570	No	Kennisis River	2 - 3 months	56 + years old	1a	1c	1d	1f	
+K2702	Yes	Kennisis River	7+ months	56 + years old	2b				
+H3623	Yes	Halls Lake	2 - 3 months	56 + years old	2c	2b	1h	1f	1e
+BH5489	Yes	Big Hawk Lake	4 - 6 months	56 + years old					
+H1535	Yes	Halls Lake	2 - 3 months	56 + years old	1c				
+LH8546	Yes	Little Hawk Lake	15 - 30 days	56 + years old	2b	2c	1a		
+K4277	Yes	Kennisis River	7+ months	56 + years old	2b	2c	1f	1e	1h
+H6738	Yes	Halls Lake	4 - 6 months	56 + years old	1f	2c	2d		
+K3148	Yes	Kennisis River	4 - 6 months	56 + years old	1f	1a	2d		
+BH7158	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1f	1d	2b	2c	1e
+H8839	Yes	Halls Lake	2 - 3 months	56 + years old	1e	2b	2c	1f	
+H4004	No	Halls Lake	4 - 6 months	56 + years old	2d				
+BH4408	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2b	1d			
+H1024	Yes	Halls Lake	4 - 6 months	56 + years old	2c	2d			
+BH1727	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2d				
+BH6217	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2d	1d	1a	1b	1f
+LH5439	Yes	Little Hawk Lake	4 - 6 months	56 + years old	2d				
+BH9164	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1f				
+BH4859	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1f				
+H4936	Yes	Halls Lake	2 - 3 months	56 + years old	1f	2b			
+LH6134	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1f	1g	1d		
+BH6047	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1f	1b	1d	1c	
+LH6857	Yes	Little Hawk Lake	2 - 3 months	56 + years old	2c	2d	1e	1f	1d
+LH6873	Yes	Little Hawk Lake	15 - 30 days	56 + years old	1c	1f	1b		
+LH6117	No	Little Hawk Lake	0 – I spent no days at our property at this address	56 + years old	1c	2d			
+H8833	No	Halls Lake	15 - 30 days	56 + years old	1a	1c	1h	2b	2c
+H3681	Yes	Halls Lake	7+ months	56 + years old	1e	1g	2b	1h	
+BH2406	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2c				
+BH5107	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1b	1d	1c		
+H3950	No	Halls Lake	4 - 6 months	56 + years old	1d				
+BH1481	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2d	1a	1b	1d	
+BH2249	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1a	2c	1e	2b	1d
+LH6092	Yes	Little Hawk Lake	15 - 30 days	56 + years old					
+H4697	Yes	Halls Lake	2 - 3 months	56 + years old	1e	2c	1f	1d	
+BH2929	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2a	2d	2b	1f	
+BH9778	No	Big Hawk Lake	7+ months	26 - 55 years old	2d				
+K5581	Yes	Kennisis River	4 - 6 months	56 + years old	2b	2d			
+H4079	Yes	Halls Lake	4 - 6 months	56 + years old	1f	2a			
+BH2452	Yes	Big Hawk Lake	2 - 3 months	26 - 55 years old	1f	1g	1e	2c	1a
+LH8092	Yes	Little Hawk Lake	4 - 6 months	56 + years old					
+LH5147	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1a	1e	2c	2d	
+LH5114	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1b	1e	1f	1d	2b
+H6107	No	Halls Lake	7+ months	56 + years old	1a	1d	1e	1f	
+K2864	Yes	Kennisis River	7+ months	56 + years old	1a				
+H6173	Yes	Halls Lake	2 - 3 months	56 + years old	2b	2c	1h	1b	1d
+H5617	Yes	Halls Lake	4 - 6 months	56 + years old	1g	2d	1a	2c	
+BH1290	Yes	Big Hawk Lake	7+ months	56 + years old	1f				
+H1070	Yes	Halls Lake	2 - 3 months	56 + years old	1h	2b	2c	1f	
+BH9960	Yes	Big Hawk Lake	2 - 3 months	Under 25 years old	1e	1d	1d		
+H4793	No	Halls Lake	2 - 3 months	56 + years old	1b	1f	1g		
+BH9558	No	Big Hawk Lake	2 - 3 months	26 - 55 years old	1a	1e			
+BH8038	No	Big Hawk Lake	2 - 3 months	56 + years old	1a	1g	1f	2d	
+K1392	No	Kennisis River	4 - 6 months	56 + years old	2b	2d	2b	1e	
+K6793	Yes	Kennisis River	4 - 6 months	56 + years old	1b	1d	1f		
+BH3004	Yes	Big Hawk Lake	7+ months	56 + years old	1f				
+BH6155	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1f				
+H2808	Yes	Halls Lake	4 - 6 months	56 + years old	1f	2c	1d	2b	1b
+H4362	Yes	Halls Lake	7+ months	56 + years old	1f	1b	1d		
+H7532	Yes	Halls Lake	7+ months	56 + years old	1f	2a	2b	2c	
+BH5026	Yes	Big Hawk Lake	2 - 3 months	Under 25 years old	1d	1d	1e	1f	1g
+H1508	Yes	Halls Lake	4 - 6 months	56 + years old	1b				
+H4613	Yes	Halls Lake	2 - 3 months	56 + years old	1h				
+BH1378	Yes	Big Hawk Lake	15 - 30 days	56 + years old	1e	1f	2c		
+H7437	Yes	Halls Lake	7+ months	56 + years old	2c				
+BH1173	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2c	1e	1f		
+LH6616	Yes	Little Hawk Lake	4 - 6 months	56 + years old	1e				
+LH7297	Yes	Little Hawk Lake	2 - 3 months	56 + years old	2b	2c	1f	1e	
+LH6948	Yes	Little Hawk Lake	15 - 30 days	56 + years old	2b	2c	1e		
+BH3225	No	Big Hawk Lake	15 - 30 days	56 + years old	1d	1f	2c	1e	
+H6144	Yes	Halls Lake	7+ months	56 + years old	2d				
+LH4508	Yes	Little Hawk Lake	4 - 6 months	56 + years old	1f	1b	2b		
+BH7857	No	Big Hawk Lake	1 - 14 days	Under 25 years old	1g	2b	1d	1d	1a
+BH9463	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1f	1a	1g	2d	
+H4030	Yes	Halls Lake	7+ months	56 + years old	2c				
+H8292	Yes	Halls Lake	7+ months	56 + years old	2c	2a			
+BH9160	Yes	Big Hawk Lake	7+ months	56 + years old	1e				
+BH5687	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2d				
+LH9883	Yes	Little Hawk Lake	4 - 6 months	26 - 55 years old	2d	2b	1f		
+BH6302	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2c	2b	1a	1d	1b
+H1212	Yes	Halls Lake	15 - 30 days	56 + years old	2d				
+H3975	Yes	Halls Lake	7+ months	56 + years old	1b	1d	1e	1f	2d
+H6672	Yes	Halls Lake	4 - 6 months	56 + years old	1g	1d	1e		
+LH6174	No	Little Hawk Lake	0 – I spent no days at our property at this address	56 + years old					
+H7101	No	Halls Lake	2 - 3 months	56 + years old	1b	1d	1f	1g	
+LH7041	Yes	Little Hawk Lake	4 - 6 months	56 + years old	2d	1f	1a	1g	
+S9000	No	Saskatchewan Lake	7+ months	56 + years old	2d				
+H3218	Yes	Halls Lake	2 - 3 months	56 + years old	1f				
+LH4950	Yes	Little Hawk Lake	2 - 3 months	56 + years old	2d	1g	1f		
+BH9817	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1a	2d	1g	2c	2a
+LH9043	Yes	Little Hawk Lake	4 - 6 months	56 + years old	1b	1d	2c	1e	1d
+LH6060	Yes	Little Hawk Lake	2 - 3 months	56 + years old	2c	2b	2d		
+H6512	Yes	Halls Lake	15 - 30 days	56 + years old	1h	1f	1g	2b	2c
+LH3429	Yes	Little Hawk Lake	7+ months	56 + years old	2b	2c		1f	1b
+BH3515	Yes	Big Hawk Lake	4 - 6 months	26 - 55 years old	1d	1a	1d		
+LH4642	Yes	Little Hawk Lake	2 - 3 months	26 - 55 years old					
+BH4406	No	Big Hawk Lake	15 - 30 days	26 - 55 years old	1e	2c			
+H9181	Yes	Halls Lake	7+ months	56 + years old	1f				
+K1934	Yes	Kennisis River	2 - 3 months	56 + years old	1d	1d	1f	1b	
+H2667	Yes	Halls Lake	2 - 3 months	56 + years old	2c				
+BH4676	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1a	1c	1b	1e	1f
+H7589	Yes	Halls Lake	2 - 3 months	56 + years old	2c	1h	1f	1d	2b
+BH4467	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2a	2b			
+H2334	Yes	Halls Lake	7+ months	56 + years old	2b				
+H2724	Yes	Halls Lake	2 - 3 months	56 + years old	2c	2a	1f	1f	
+BH2473	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1c				
+BH4599	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2a	2b			
+BH2712	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1f	1e	2b	2d	
+K1122	Yes	Kennisis River	7+ months	56 + years old	1d	1b	1c	1a	
+LH5754	Yes	Little Hawk Lake	4 - 6 months	56 + years old	1a	1c	1g		
+K5885	Yes	Kennisis River	4 - 6 months	56 + years old	1d	1d	2c	2b	2a
+BH1445	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2d				
+LH1604	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1f	1g	2d		
+LH1941	Yes	Little Hawk Lake	15 - 30 days	56 + years old	1c	1b	1a		
+BH3183	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2b	2c			
+H9343	Yes	Halls Lake	2 - 3 months	56 + years old					
+K1109	Yes	Kennisis River	7+ months	56 + years old	1a	1b	1c	1d	1e
+BH6616	No	Big Hawk Lake	15 - 30 days	26 - 55 years old	2c	1e			
+K5489	Yes	Kennisis River	4 - 6 months	56 + years old	1c	1d	1f	2b	2d
+H8731	Yes	Halls Lake	4 - 6 months	56 + years old	1f				
+LH4253	No	Little Hawk Lake	1 - 14 days	56 + years old	1f	1b	1d	1e	1d
+BH2642	Yes	Big Hawk Lake	1 - 14 days	Under 25 years old	1d	1a	1b	1d	1e
+BH6379	Yes	Big Hawk Lake	4 - 6 months	Under 25 years old	1a	1b	1c	1d	1f
+H1711	Yes	Halls Lake	15 - 30 days	56 + years old	1b	2d	1d		
+LH3832	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1e	1f	1d	1d	1g
+H5620	No	Halls Lake	7+ months	26 - 55 years old	1f	2c	1e		
+LH5584	Yes	Little Hawk Lake	15 - 30 days	56 + years old	1a	1b	1c	1d	1g
+BH8575	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1f				
+BH3754	Yes	Big Hawk Lake	1 - 14 days	26 - 55 years old	1f	1b			
+BH2428	No	Big Hawk Lake	15 - 30 days	Under 25 years old	2a				
+BH5623	No	Big Hawk Lake	4 - 6 months	56 + years old	2a	2b	2c	2d	
+LH8424	No	Little Hawk Lake	4 - 6 months	26 - 55 years old	1f	2c	2b		
+BH4600	Yes	Big Hawk Lake	15 - 30 days	56 + years old	2b	2c	2d		
+H6263	No	Halls Lake	7+ months	56 + years old	1a	1b	1c	1d	1e
+BH3674	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2c	2d			
+BH4261	Yes	Big Hawk Lake	15 - 30 days	56 + years old	1d				
+H3212	Yes	Halls Lake	7+ months	56 + years old	1f	1b			
+C1984	No	Clear Lake	1 - 14 days	56 + years old	1f				
+LH6694	No	Little Hawk Lake	15 - 30 days	26 - 55 years old	1b	2d	2c		
+H6310	No	Halls Lake	15 - 30 days	26 - 55 years old	1f	1d	1b		
+H8869	Yes	Halls Lake	7+ months	26 - 55 years old	1h				
+LH9696	Yes	Little Hawk Lake	15 - 30 days	56 + years old	2d				
+BH3833	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2c				
+H5626	No	Halls Lake	7+ months	26 - 55 years old	1e	1g	1f	1b	1d
+H1038	Yes	Halls Lake	2 - 3 months	56 + years old	1f				
+LH1413	No	Little Hawk Lake	15 - 30 days	56 + years old	2d	2c			
+H3316	No	Halls Lake	7+ months	56 + years old	1h	1g			
+LH8332	No	Little Hawk Lake	7+ months	56 + years old	2d				
+BH5084	No	Big Hawk Lake	1 - 14 days	26 - 55 years old	1a	1b	1c	2b	1a
+H7468	Yes	Halls Lake	7+ months	56 + years old	2b				
+H3260	No	Halls Lake	2 - 3 months	56 + years old	2c	2a	1b		
+H3118	No	Halls Lake	1 - 14 days	26 - 55 years old	2b				
+LH9389	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1b				
+H7276	Yes	Halls Lake	4 - 6 months	56 + years old	1f				
+BB2479	Yes	Big brother lake	2 - 3 months	26 - 55 years old	1b	1f	1a		
+BH5820	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1d				
+BH1522	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2a	2b			
+BH6913	Yes	Big Hawk Lake	15 - 30 days	56 + years old	1f				
+H2719	Yes	Halls Lake	7+ months	56 + years old					
+BH6692	Yes	Big Hawk Lake	7+ months	56 + years old	1b	1f	1c		
+BH6066	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1a	1d	2c		
+BH3203	Yes	Big Hawk Lake	2 - 3 months	26 - 55 years old	1f	1b	1g		
+BH2018	Yes	Big Hawk Lake	2 - 3 months	56 + years old	1e	2b	2b	1f	1d
+BH6091	Yes	Big Hawk Lake	7+ months	56 + years old	2d				
+H8680	Yes	Halls Lake	4 - 6 months	56 + years old	2d				
+LH4210	Yes	Little Hawk Lake	2 - 3 months	56 + years old	2d				
+BH4190	Yes	Big Hawk Lake	15 - 30 days	56 + years old	1b	2c	1f		
+K5573	No	Kennisis River	2 - 3 months	56 + years old	2b	1e	1d		
+LH7152	No	Little Hawk Lake	1 - 14 days	26 - 55 years old	1e	1f	1c	1b	1g
+BH6941	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1g				
+BH7841	Yes	Big Hawk Lake	4 - 6 months	56 + years old	2d	1b			
+K4808	Yes	Kennisis River	7+ months	56 + years old	1a				
+BH3702	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1a	1b	2b	2c	2d
+LH6749	Yes	Little Hawk Lake	4 - 6 months	56 + years old	2b	2a	1d	1e	
+BH2005	No	Big Hawk Lake	1 - 14 days	Under 25 years old	1b	1c			
+K9700	Yes	Kennisis River	7+ months	56 + years old	2b	2c			
+BH6286	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1b	1e	2b	1f	1a
+LH3479	Yes	Little Hawk Lake	15 - 30 days	56 + years old	2d				
+H8495	Yes	Halls Lake	7+ months	56 + years old					
+LH5858	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1b	1a	1d		
+H2506	Yes	Halls Lake	4 - 6 months	56 + years old	1b	2c	2b	1d	
+BH2898	Yes	Big Hawk Lake	7+ months	56 + years old	2d				
+BH1157	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1f				
+BH8998	No	Big Hawk Lake	7+ months	26 - 55 years old	1d				
+H4193	No	Halls Lake	15 - 30 days	56 + years old	1f	2c	1b	1d	1e
+LH3177	Yes	Little Hawk Lake	4 - 6 months	56 + years old	1b	1d	2a	2b	2c
+BH8635	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2b				
+LH1456	No	Little Hawk Lake	2 - 3 months	56 + years old	2a	2b	2c		
+BH7605	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1f	2d			
+H4034	No	Halls Lake	4 - 6 months	26 - 55 years old	2c	1a	1d	1d	
+BH1402	Yes	Big Hawk Lake	1 - 14 days	56 + years old	1f	1a			
+BH5024	Yes	Big Hawk Lake	4 - 6 months	56 + years old	1f	1b	1g	1a	
+H3445	No	Halls Lake	4 - 6 months	56 + years old	1h				
+LH1871	Yes	Little Hawk Lake	4 - 6 months	56 + years old	1f				
+BH9897	No	Big Hawk Lake	4 - 6 months	26 - 55 years old	1d				
+H9988	No	Halls Lake	15 - 30 days	56 + years old	2a	2b	2c	2d	
+LH9062	Yes	Little Hawk Lake	4 - 6 months	56 + years old	1h				
+LH4919	Yes	Little Hawk Lake	2 - 3 months	56 + years old	1d	1g	1c	1e	1f
+BH9417	Yes	Big Hawk Lake	2 - 3 months	56 + years old	2d				
+H1444	No	Halls Lake	4 - 6 months	56 + years old					
+H9409	Yes	Halls Lake	7+ months	56 + years old	1d				
+H4750	Yes	Halls Lake	2 - 3 months	56 + years old	1d	1f	1b	1d	
+B3111	Yes	Boshkung	4 - 6 months	26 - 55 years old	2d	2c			
+H3171	No	Halls Lake	4 - 6 months	56 + years old	1f	2c	2a	2d	2b
+LH4984	Yes	Little Hawk Lake	4 - 6 months	26 - 55 years old	1f	2a	2c	2b	
+H5851	No	Halls Lake	4 - 6 months	26 - 55 years old	1a	1b	1e		
+H6979	No	Halls Lake	7+ months	56 + years old	2b				
+H8487	No	Halls Lake	15 - 30 days	Under 25 years old	1d	1d	1e	1f	2b
+H9031	No	Halls Lake	15 - 30 days	26 - 55 years old	1a	1d	1d	1f	1h
+H5179	No	Halls Lake	4 - 6 months	56 + years old	1d	1e			
+K2544	No	Kennisis River	15 - 30 days	56 + years old	1b				

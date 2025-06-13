@@ -48,6 +48,130 @@ Survey responses have been categorized into five categories:
 dat <- read_csv(here("data", "lake_plan_survey.csv"))
 ```
 
+# Executive summary plots
+
+Sideways stacked bar plots for lake use-related questions, as these had the most divided support.
+
+```{r}
+lake_use <- dat %>% dplyr::select(Construction_of_water_ski_courses,
+                                  Fishing_and_angling,
+                                  Fishing_tournaments_and_derbies,
+                                  Bait_fish_release,
+                                  Ice_fishing,
+                                  Hunting,
+                                  Snowmobiling,
+                                  ATV_operation,
+                                  Camping_facilities,
+                                  Number_of_people_using_campsites,
+                                  Pollution_from_campsites) %>% 
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Construction_of_water_ski_courses:Pollution_from_campsites,
+               names_to = "question", values_to = "response")
+
+lake_use <- lake_use %>% 
+  na.omit() %>% 
+  group_by(question) %>% 
+  mutate(category = case_when(response == 5 ~ "strongly_agree",
+                              response == 4 ~ "agree",
+                              response == 3 ~ "neither",
+                              response == 2 ~ "disagree",
+                              response == 1 ~ "strongly_disagree"))
+summary <- lake_use %>% 
+  group_by(question, category) %>% 
+  summarize(no_respondents = n())
+
+summary <- summary %>% 
+  mutate(total_respondents = sum(no_respondents),
+         prop_respondents = no_respondents/total_respondents*100) %>% 
+  # group_by(question, category) %>% 
+  arrange(prop_respondents)
+
+# mutate(name = fct_reorder(name, val))
+
+# summary$category <- factor(summary$category, levels = c("strongly_agree", "agree", "neither", "disagree", "strongly_disagree"))
+summary$category <- factor(summary$category, levels = c("strongly_disagree", "disagree", "neither", "agree", "strongly_agree"))
+summary$question <- factor(summary$question, levels = c("Pollution_from_campsites", "Bait_fish_release", "Number_of_people_using_campsites", "Ice_fishing", "Camping_facilities", "Construction_of_water_ski_courses", "Hunting", "ATV_operation", "Fishing_tournaments_and_derbies", "Fishing_and_angling", "Snowmobiling"))
+```
+
+Build plots:
+
+```{r}
+summary %>% 
+  ggplot() +
+  geom_bar(stat = "identity", 
+           aes(x = question, y = prop_respondents, group = category, fill = category), 
+           position = "stack") +
+  # scale_fill_manual(values = c("#186484", "#448cbc", "#ffd85b", "#d1864b", "#a95e37")) +
+  # scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
+  scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  coord_flip() +
+  ylab("Proportion of respondents") +
+  xlab("Land use issue") +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        legend.position = "bottom") +
+  scale_y_continuous(expand = c(0, 0))
+
+ggsave(here("plots", "lake_use_results_gradient.pdf"), height = 3, width = 7.6)
+```
+
+Bar plot for three issues related to development:
+
+```{r}
+dev_dat <- dat %>% dplyr::select(Shoreline_infrastructure,
+                                 Cell_towers,
+                                 Backlot_development) %>% 
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Shoreline_infrastructure:Backlot_development,
+               names_to = "question", values_to = "response")
+
+dev_dat <- dev_dat %>% 
+  na.omit() %>% 
+  group_by(question) %>% 
+  mutate(category = case_when(response == 5 ~ "strongly_agree",
+                              response == 4 ~ "agree",
+                              response == 3 ~ "neither",
+                              response == 2 ~ "disagree",
+                              response == 1 ~ "strongly_disagree"))
+summary_dev <- dev_dat %>% 
+  group_by(question, category) %>% 
+  summarize(no_respondents = n())
+
+summary_dev <- summary_dev %>% 
+  mutate(total_respondents = sum(no_respondents),
+         prop_respondents = no_respondents/total_respondents*100) %>% 
+  # group_by(question, category) %>% 
+  arrange(prop_respondents)
+
+summary_dev$category <- factor(summary_dev$category, levels = c("strongly_disagree", "disagree", "neither", "agree", "strongly_agree"))
+summary_dev$question <- factor(summary_dev$question, 
+                               levels = c("Shoreline_infrastructure",
+                                          "Cell_towers",
+                                          "Backlot_development"))
+```
+
+Build plots:
+
+```{r}
+summary_dev %>% 
+  ggplot() +
+  geom_bar(stat = "identity", 
+           aes(x = question, y = prop_respondents, group = category, fill = category), 
+           position = "stack") +
+  # scale_fill_manual(values = c("#186484", "#448cbc", "#ffd85b", "#d1864b", "#a95e37")) +
+  # scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
+  scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  coord_flip() +
+  ylab("Proportion of respondents") +
+  xlab("Land use issue") +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        legend.position = "bottom") +
+  scale_y_continuous(expand = c(0, 0))
+
+ggsave(here("plots", "dev_results_gradient.pdf"), height = 1.5, width = 7.6)
+```
+
 # Run MANOVA
 
 ### Nature
@@ -354,4 +478,39 @@ manova_access_v_amenities <- manova(cbind(Frequency_of_O.P.P._marine_patrols,
 #Summary
 summary(manova_access_v_amenities)
 summary.aov(manova_access_v_amenities)
+```
+
+## Top 11 issues
+
+Import and process data.
+
+```{r}
+top_issues <- read_tsv(here("data", "survey_top_issues.txt")) %>% 
+  pivot_longer(cols = "Top_11_enviro_issues":"...10", names_to = "tmp", values_to = "answer_code") %>% 
+  dplyr::select(-tmp) %>% 
+  na.omit() %>% 
+  mutate(issue = case_when(answer_code == "1a" ~ "natural_beauty",
+                           answer_code == "1b" ~ "natural_shoreline",
+                           answer_code == "1c" ~ "unique_habitats",
+                           answer_code == "1d" ~ "native_species",
+                           answer_code == "1e" ~ "invasive_species",
+                           answer_code == "1f" ~ "water_quality",
+                           answer_code == "1g" ~ "dark_skies",
+                           answer_code == "1h" ~ "causeway",
+                           answer_code == "2a" ~ "water_clarity",
+                           answer_code == "2b" ~ "bacteria",
+                           answer_code == "2c" ~ "algae",
+                           answer_code == "2d" ~ "water_levels"))
+```
+
+Top three issues
+
+```{r}
+# Overall
+
+
+# By lake/river
+
+# By age group
+
 ```

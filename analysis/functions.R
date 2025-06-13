@@ -11,4 +11,3 @@ data_colors <- function(type = "assorted") {
   if (type == "warms") data_cols <- c("#704c14", "#f07434", "#a82c94", "#e0840c", "#bd724b", "goldenrod1")
   return(data_cols)
 }
-
