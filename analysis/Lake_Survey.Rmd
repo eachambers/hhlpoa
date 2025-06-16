@@ -507,9 +507,17 @@ Top three issues
 
 ```{r}
 # Overall
-
+top_issues %>% 
+  group_by(issue) %>% 
+  summarise(n()) %>% 
+  top_n(3)
 
 # By lake/river
+top_issues %>% 
+  filter(Lake %in% c("Halls Lake", "Little Hawk Lake", "Big Hawk Lake", "Kennisis River")) %>% 
+  group_by(Lake, issue) %>% 
+  summarise(n()) %>% 
+  top_n(3)
 
 # By age group
 
