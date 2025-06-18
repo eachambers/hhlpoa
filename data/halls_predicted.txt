@@ -1,0 +1,8 @@
+Year	Lake	Biotic_index	avg_value	site_code_norep	Lake Name
+2024	Halls	mHBI	NA	HALL-01	Halls Lake
+2025	Halls	mHBI	NA	HALL-01	Halls Lake
+2026	Halls	mHBI	NA	HALL-01	Halls Lake
+2027	Halls	mHBI	NA	HALL-01	Halls Lake
+2028	Halls	mHBI	NA	HALL-01	Halls Lake
+2029	Halls	mHBI	NA	HALL-01	Halls Lake
+2030	Halls	mHBI	NA	HALL-01	Halls Lake

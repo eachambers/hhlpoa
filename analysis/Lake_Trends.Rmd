@@ -46,7 +46,7 @@ ice$doy <- yday(ice$YMD)
 Build plot:
 
 ```{r}
-ice %>% 
+p_ice <- ice %>% 
   group_by(Year, Month) %>% 
   ggplot(aes(x = Year, y = doy, group = 1)) +
   # geom_point(size = 3, color = lake_cols[["bighawk"]]) +
@@ -64,6 +64,25 @@ ice %>%
 
 # Save plot in "plots" directory
 ggsave(here("plots", "ice_out.pdf"), width = 3.5, height = 2.5)
+
+# For AGM pres
+ice %>% 
+  group_by(Year, Month) %>% 
+  ggplot(aes(x = Year, y = doy, group = 1)) +
+  geom_point(size = 4, color = "#b4d6e7") +
+  geom_line(linewidth = 2, color = "#b4d6e7") +
+  geom_smooth(method = 'lm', se = F, color = "#186484") +
+  ylab("Ice out date") +
+  scale_x_continuous(breaks = scales::breaks_width(5)) +
+  ggtitle("Ice-out dates for Big Hawk Lake (1968-2025)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        plot.title = element_text(size = 16)) +
+    geom_point(data = ice %>% filter(Year == 2012 | Year == 1992), 
+             aes(x = Year, y = doy), size = 4, pch = 21, color = "black")
+
+ggsave(here("plots", "ice_out_pres.pdf"), width = 8, height = 5.5)
 ```
 
 Find earliest and latest ice-out dates:
@@ -188,9 +207,16 @@ Calculate average clarity in each lake for each year.
 
 ```{r}
 sum <- secchi %>% 
-  filter(`Lake Name` == "HALLS LAKE") %>% 
+  # filter(`Lake Name` == "HALLS LAKE") %>% 
   group_by(Year) %>% 
-  summarize(mean(`Secchi Depth (m)`))
+  summarize(mean_per_year = mean(`Secchi Depth (m)`))
+
+# Average decline in clarity across all three lakes
+secchi %>% 
+  filter(`Lake Name` == "HALLS LAKE") %>% 
+  filter(Year == 1991 | Year == 2022) %>% 
+  group_by(Year) %>% 
+  summarize(mean_per_year = mean(`Secchi Depth (m)`))
 ```
 
 ### Water quality
@@ -300,6 +326,7 @@ phos_dat %>%
   ggtitle("Kushog Lake") +
   geom_hline(yintercept = 10, color = "darkred", linetype = "dashed")
 ```
+
 Plot averages per site on each lake (other than our three):
 
 ```{r}
@@ -703,10 +730,29 @@ Get averages for executive summary:
 ```{r}
 indices %>% 
   filter(Biotic_index == "mHBI") %>% 
-  # filter(`Lake Name` == "Halls Lake") %>% 
+  # filter(`Lake Name` == "Halls Lake") %>%
+  # filter(`Lake Name` == "Big Hawk Lake") %>%
+  filter(`Lake Name` == "Little Hawk Lake") %>%
   group_by(Year) %>% 
   na.omit() %>% 
   summarize(mean(avg_value))
+
+rect_data %>% filter(Biotic_index == "mHBI")
+```
+
+Extrapolate mHBI in five years for Halls Lake.
+
+```{r}
+pred <- read_tsv(here("data", "halls_predicted.txt"))
+pred <- bind_rows(indices %>% 
+  filter(Biotic_index == "mHBI") %>% 
+  filter(`Lake Name` == "Halls Lake"), pred)
+
+predicted <- pred %>%
+  mutate(predicted_vals = coalesce(avg_value, predict(lm(avg_value ~ Year),
+                                                      across(Year))))
+
+predicted %>% filter(Year == 2030) %>% pull(predicted_vals)
 ```
 
 #### Percent EOT
@@ -781,7 +827,7 @@ veg <-
 Build plots.
 
 ```{r}
-veg %>% 
+p_algae <- veg %>% 
   ggplot(aes(x = Year, y = value, group = Vegetation_type, fill = Vegetation_type)) +
   geom_bar(stat = "identity", position = "stack") +
   facet_grid(~`Lake Name`, scales = "free") +
@@ -803,8 +849,30 @@ veg %>%
   ylab("Abundance of algae")
   # ylab("Algal abundance, summed across sites")
 
-# Save plot
-ggsave(here("plots", "algae_hhl.pdf"), width = 3.5, height = 3)
+p_algae
+# Save plot for executive summary
+ggsave(here("plots", "algae_hhl.pdf"), width = 3.5, height = 3) # for exec sum
+
+# For AGM presentation
+p_algae +
+  theme(strip.text = element_text(size = 14, face = "bold"),
+        strip.background = element_blank(),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 16),
+        axis.title = element_text(size = 14),
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12, angle = 45, hjust = 1),
+        legend.position = "bottom") +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(breaks = 2019:2024) +
+  scale_fill_manual(values = c("#186484", "#448cbc", "#b4d6e7"),
+                    name = "Type of algae") +
+  # scale_fill_manual(values = c("#596b36", "#a9cc68", "#fcf79b"), 
+  #                   name = "Type of algae") +
+  ggtitle("Algal growth (2019-2024)") +
+  ylab("Abundance of algae")
+
+ggsave(here("plots", "algae_hhl_pres.pdf"), width = 8, height = 5.5) # for pres
 ```
 
 Run stats.
@@ -1011,12 +1079,12 @@ ggsave(here("plots", "fluct_hhl.pdf"), width = 12, height = 8)
 Run statistics:
 
 ```{r}
-lm(Fluctuation ~ Year, 
+lm(fluctuation ~ Year, 
    data = fluct %>% 
      filter(Lake == "Hawk")) %>%
   summary() # coeff -0.02117, SIG @ . -> 0.0931
 
-lm(Fluctuation ~ Year, 
+lm(fluctuation ~ Year, 
    data = fluct %>% 
      filter(Lake == "Halls")) %>%
   summary() # coeff -0.012222, NOT SIG
@@ -1025,18 +1093,18 @@ lm(Fluctuation ~ Year,
 fluct %>% 
   filter(Lake == "Hawk") %>% 
   ungroup() %>% 
-  summarize(mean(Fluctuation))
+  summarize(mean(fluctuation))
 
 fluct %>% 
   filter(Lake == "Halls") %>% 
   ungroup() %>% 
-  summarize(mean(Fluctuation))
+  summarize(mean(fluctuation))
 
 # Min and max levels
 fluct %>% 
   ungroup() %>% 
   group_by(Lake) %>% 
-  filter(min(Minimum), max(Maximum))
+  summarize(min(minimum), max(maximum))
 ```
 
 
@@ -1044,8 +1112,9 @@ fluct %>%
 
 The following map was downloaded using Ontario GeoHub and is a cropped version of the Ontario Land Cover Compilation v2.0, available [here](https://www.arcgis.com/home/item.html?id=7aa998fdf100434da27a41f1c637382c).
 
-```{r}
-tsw <- read_tsv(here("data", "TSW_coords.txt"))
+The following is how the map was created; this code is not run.
+
+```
 # map <- terra::rast(here("data", "OLCC_V2_TIFF", "OLCC_V2_TIFF.tif"))
 # newcrs = "+proj=longlat +datum=WGS84"
 # newmap <- terra::project(map, newcrs)
@@ -1053,19 +1122,18 @@ tsw <- read_tsv(here("data", "TSW_coords.txt"))
 # subset <- terra::crop(newmap, bounds)
 # # Save cropped object
 # terra::writeRaster(subset, here("data", "ontario_map.tif"))
+```
 
+This is a WIP and so is not run either.
+
+```
+tsw <- read_tsv(here("data", "TSW_coords.txt"))
 subset <- terra::rast(here("data", "ontario_map.tif"))
 
 pal = c("#844836", "#b07156", "#b99364", "#dac3a9", "#8fa997") # , "#6baeb0", "#376988"
 palette = grDevices::colorRampPalette(pal)(100)
 palette <- rev(palette)
 
-# dat <- terra::as.data.frame(subset, xy = TRUE)
-
-unique(dat$OLCC_V2_TIFF)
-subset[subset == 247] <- NA
-
-# TODO add manual coloration in here
 ggplot() +
   geom_spatraster(data = subset) +
   # scale_fill_gradientn(colors = palette, na.value = NA) +
