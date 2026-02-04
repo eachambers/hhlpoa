@@ -1,0 +1,6 @@
+Buffer (m)	Wells protected	Prop wells protected at 500m
+100	44	38.9
+150	62	54.9
+200	73	64.6
+250	86	76.1
+300	93	82.3

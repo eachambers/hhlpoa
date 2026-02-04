@@ -1,0 +1,144 @@
+---
+title: "Mapping"
+output:
+  github_document:
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(cowplot)
+library(tidyterra)
+library(sf)
+library(viridis)
+theme_set(theme_cowplot())
+
+source(here("analysis", "Mapping_functions.R"))
+```
+
+## Get input files
+
+Set boundaries for overall range of lakes and individual lakes for mapping.
+
+```{r}
+bounds <- c(xmin = -78.778633, xmax = -78.676156, ymin = 45.090094, ymax = 45.189185)
+
+halls_bounds <- c(xmin = -78.763835, xmax = -78.724982, ymin = 45.095129, ymax = 45.123332)
+lhl_bounds <- c(xmin = -78.727100, xmax = -78.681925, ymin = 45.132031, ymax = 45.168768)
+bhl_bounds <- c(xmin = -78.764062, xmax = -78.709808, ymin = 45.141992, ymax = 45.180400)
+biglittle_bounds <- c(xmin = -78.764062, xmax = -78.681925, ymin = 45.132031, ymax = 45.180400)
+```
+
+Retrieve all maps, cropping to specified boundaries. Save cropped files for ease.
+
+```{r}
+shp <- get_ontario_shapefiles(bounds = bounds, save_cropped = TRUE)
+```
+
+## Bathymetry
+
+Let's extract each lake individually.
+
+```{r}
+halls_bathy <- sf::st_crop(shp$bathymetry, halls_bounds)
+lhl_bathy <- sf::st_crop(shp$bathymetry, lhl_bounds)
+bhl_bathy <- sf::st_crop(shp$bathymetry, bhl_bounds)
+```
+
+Build maps for each lake.
+
+```{r}
+p_lhl <- ggplot() +
+  geom_sf(data = shp$ontario %>% sf::st_crop(lhl_bounds), 
+          color = NA, fill = "lightgrey") +
+  geom_sf(data = shp$waterbody %>% sf::st_crop(lhl_bounds), 
+          fill = "white", color = NA) +
+  geom_sf(data = lhl_bathy, 
+          linewidth = 0.5, aes(color = DEPTH)) +
+  scale_color_viridis_c(option = "G", name = "Depth (metres)",
+                        limits = c(-86, 0)) +
+  theme_map()
+  # ggtitle("Little Hawk Lake")
+
+p_bhl <- ggplot() +
+  geom_sf(data = shp$ontario %>% sf::st_crop(bhl_bounds), 
+          color = NA, fill = "lightgrey") +
+  geom_sf(data = shp$waterbody %>% sf::st_crop(bhl_bounds), 
+          fill = "white", color = NA) +
+  geom_sf(data = bhl_bathy, 
+          linewidth = 0.5, aes(color = DEPTH)) +
+  scale_color_viridis_c(option = "G", name = "Depth (metres)",
+                        limits = c(-86, 0)) +
+  theme_map()
+  # theme(legend.position = "none") +
+  # ggtitle("Big Hawk Lake")
+
+p_halls <- ggplot() +
+  geom_sf(data = shp$ontario %>% sf::st_crop(halls_bounds), 
+          color = NA, fill = "lightgrey") +
+  geom_sf(data = shp$waterbody %>% sf::st_crop(halls_bounds), 
+          fill = "white", color = NA) +
+  geom_sf(data = halls_bathy %>% filter(row_number() %% 5 == 1),
+  # geom_sf(data = halls_bathy, 
+          linewidth = 0.5, aes(color = DEPTH)) +
+  scale_color_viridis_c(option = "G", 
+                        name = "Depth (metres)",
+                        limits = c(-86, 0)) +
+  theme_map()
+  # theme(legend.position = "none") +
+  # ggtitle("Halls Lake")
+
+# Plot all together
+# plot_grid(p_halls, p_bhl, p_lhl, nrow = 1, rel_heights = c(1, 1.2, 2))
+
+# Save plots
+ggsave(p_halls, filename = here("plots/bathymetry_halls.pdf"), width = 8, height = 8)
+ggsave(p_lhl, filename = here("plots/bathymetry_LHL.pdf"), width = 7, height = 7)
+ggsave(p_bhl, filename = here("plots/bathymetry_BHL.pdf"), width = 7, height = 7)
+```
+
+## Aggregate deposits
+
+## Narrow waterbodies & steep cliffs
+
+## Geology
+
+```{r}
+ggplot() +
+  geom_sf(data = shp$ontario %>% sf::st_crop(bounds), 
+          color = NA, fill = "lightgrey") +
+  geom_sf(data = shp$geology, aes(fill = UNITNAME_P)) +
+  # scale_fill_manual() +
+  geom_sf(data = shp$waterbody %>% sf::st_crop(bounds),
+          fill = "lightblue", color = NA, alpha = 0.5) +
+  theme_map()
+```
+
+Quaternary geology
+
+```{r}
+ggplot() +
+  geom_sf(data = shp$ontario %>% sf::st_crop(bounds), 
+          color = NA, fill = "lightgrey") +
+  geom_sf(data = shp$quatgeo, aes(fill = UNIT_NAME), color = NA) +
+  # scale_fill_manual() +
+  geom_sf(data = shp$waterbody %>% sf::st_crop(bounds),
+          fill = "lightblue", color = NA, alpha = 0.5) +
+  theme_map()
+```
+
+## Wetland categorization
+
+```{r}
+
+```
+
+## Base map
+
+```{r}
+ggplot() +
+  geom_sf(data = bathymetry) +
+  geom_sf(data = waterbody, fill = "blue")
+```

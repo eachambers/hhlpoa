@@ -1,0 +1,6 @@
+Lake	Category	Number	Percentage
+Halls	Well	46	24.7311828
+Halls	Spring	3	1.612903226
+Halls	Surface water	123	66.12903226
+Halls	Water from elsewhere	4	2.150537634
+Halls	Municipal water source	10	5.376344086
