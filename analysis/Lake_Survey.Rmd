@@ -580,16 +580,6 @@ ame_dat %>%
 ggsave(here("plots/amen_means.pdf"), width = 6, height = 4)
 ```
 
-Save all of the above plots.
-
-```{r}
-p_nat
-p_leg
-p_lakeuse
-p_dev
-p_amen
-```
-
 # Testing for predictors
 
 We want to see if there are any significant predictors for survey responses. To do so, we assessed survey responses based on four factors:

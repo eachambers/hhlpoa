@@ -323,8 +323,6 @@ dotemp <- dotemp %>%
   mutate(Zone = case_when(Depth <= 2 ~ "Surface",
                           Depth <= 10 ~ "Mid",
                           TRUE ~ "Deep"))
-  # pivot_wider(names_from = Statistic, values_from = Value) %>% 
-  # filter(!is.na(DO))
 
 # Calculate zone-based means for fall months only
 zone_means_fall <- dotemp %>%
@@ -362,13 +360,6 @@ zone_means_summer %>% summarize(min(mean_DO),
 # summary(model_temp) # adj R-squared = -1.869, pvalue = 0.9779
 # coef(summary(model_temp))
 # confint(model_temp)
-
-do_halls <- ggplot(zone_means %>% filter(Lake == "Halls"), 
-                   aes(x = Year, y = mean_DO)) +
-  geom_smooth(method = "lm", se = TRUE) +
-  geom_point(size = 3) +
-  theme_bw() +
-  facet_grid(~Zone)
 ```
 
 ## Lake Health
