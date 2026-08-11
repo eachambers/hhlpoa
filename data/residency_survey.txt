@@ -1,0 +1,11 @@
+Response	Number	Total	Percentage	Category
+4-6_mos	70	213	32.86384977	Residence_timing
+2-3_mos	62	213	29.10798122	Residence_timing
+7+_mos	40	213	18.77934272	Residence_timing
+15-30_d	29	213	13.61502347	Residence_timing
+1-14d	10	213	4.694835681	Residence_timing
+0_mos	2	213	0.938967136	Residence_timing
+No	158	211	74.88151659	Future_residence
+Already_is	27	211	12.79620853	Future_residence
+Yes	15	211	7.109004739	Future_residence
+Undecided	11	211	5.213270142	Future_residence

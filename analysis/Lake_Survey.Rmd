@@ -15,22 +15,24 @@ library(grid)
 library(gridExtra)
 library(interactions)
 library(cowplot)
+library(gtExtras)
+library(MVZlibrary)
 theme_set(theme_cowplot())
+
+source(here("analysis", "functions.R"))
+
+# Import colors
+lake_cols_raw <- lake_colors(raw_data = TRUE)
+data_cols_warms <- data_colors(type = "warms")
+data_cols <- data_colors(type = "assorted")
+lake_col_full <- lake_colors(full_names = TRUE)
 ```
 
 ## Background
 
-We want to assess survey responses based on four factors:
+We first want to generate plots that summarize the survey results in terms of the different categories.
 
-1.  Age of association member
-
-2.  Length of property ownership
-
-3.  The lake that the member has property on
-
-4.  Type of property access
-
-Survey responses have been categorized into five categories:
+Survey responses have been grouped into five categories:
 
 1.  Nature
 
@@ -48,9 +50,11 @@ Survey responses have been categorized into five categories:
 dat <- read_csv(here("data", "lake_plan_survey.csv"))
 ```
 
-# Executive summary plots
+# Summary plots
 
-Sideways stacked bar plots for lake use-related questions, as these had the most divided support.
+Build sideways stacked bar plots for survey results, divided based on the category of question.
+
+### Lake Use
 
 ```{r}
 lake_use <- dat %>% dplyr::select(Construction_of_water_ski_courses,
@@ -86,14 +90,27 @@ summary <- summary %>%
   # group_by(question, category) %>% 
   arrange(prop_respondents)
 
-# mutate(name = fct_reorder(name, val))
+# Overall percentage of agree/strongly agree
+summary %>% 
+  ungroup() %>% 
+  filter(category %in% c("agree", "strongly_agree")) %>% 
+  summarize(agree = sum(no_respondents),
+            total = sum(total_respondents),
+            percent = agree/total*100)
 
-# summary$category <- factor(summary$category, levels = c("strongly_agree", "agree", "neither", "disagree", "strongly_disagree"))
+# Percentage of agree/strongly agree by question
+summary %>% 
+  group_by(question) %>% 
+  filter(category %in% c("agree", "strongly_agree")) %>% 
+  summarize(agree_stronglyagree = sum(no_respondents),
+            total = sum(total_respondents),
+            percent = agree_stronglyagree/total*100)
+
 summary$category <- factor(summary$category, levels = c("strongly_disagree", "disagree", "neither", "agree", "strongly_agree"))
 summary$question <- factor(summary$question, levels = c("Pollution_from_campsites", "Bait_fish_release", "Number_of_people_using_campsites", "Ice_fishing", "Camping_facilities", "Construction_of_water_ski_courses", "Hunting", "ATV_operation", "Fishing_tournaments_and_derbies", "Fishing_and_angling", "Snowmobiling"))
 ```
 
-Build plots:
+Build plot:
 
 ```{r}
 summary %>% 
@@ -101,29 +118,31 @@ summary %>%
   geom_bar(stat = "identity", 
            aes(x = question, y = prop_respondents, group = category, fill = category), 
            position = "stack") +
-  # scale_fill_manual(values = c("#186484", "#448cbc", "#ffd85b", "#d1864b", "#a95e37")) +
-  # scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
-  scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  # scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#045070")) +
   coord_flip() +
   ylab("Proportion of respondents") +
-  xlab("Land use issue") +
-  theme(axis.title = element_text(size = 12),
+  # xlab("Land use issue") +
+  theme(axis.title.x = element_text(size = 12),
         axis.text = element_text(size = 10),
-        legend.position = "bottom") +
+        legend.position = "bottom",
+        axis.title.y = element_blank()) +
   scale_y_continuous(expand = c(0, 0))
 
 ggsave(here("plots", "lake_use_results_gradient.pdf"), height = 3, width = 7.6)
 ```
 
-Bar plot for three issues related to development:
+### Development
 
 ```{r}
-dev_dat <- dat %>% dplyr::select(Shoreline_infrastructure,
-                                 Cell_towers,
-                                 Backlot_development) %>% 
+dev_dat <- dat %>% 
+  # dplyr::select(Shoreline_infrastructure, Cell_towers, Backlot_development) %>% 
+  dplyr::select(Condominiums,	Trailer_parks, Shipping_container_dwellings, `Floating_homes/barges`, Timeshare_dwellings, Hobby_farms, `Non-residential_commercial_development`,	Cell_towers, Backlot_development, Shoreline_infrastructure, Shoreline_minimum_setback, Shoreline_lot_minimum_frontage, Enforcement_for_upkeep_of_waste_systems) %>% 
   mutate(respondent = 1:nrow(dat)) %>% 
-  pivot_longer(cols = Shoreline_infrastructure:Backlot_development,
+  pivot_longer(cols = Condominiums:Enforcement_for_upkeep_of_waste_systems,
                names_to = "question", values_to = "response")
+  # pivot_longer(cols = Shoreline_infrastructure:Backlot_development,
+  #              names_to = "question", values_to = "response")
 
 dev_dat <- dev_dat %>% 
   na.omit() %>% 
@@ -144,13 +163,11 @@ summary_dev <- summary_dev %>%
   arrange(prop_respondents)
 
 summary_dev$category <- factor(summary_dev$category, levels = c("strongly_disagree", "disagree", "neither", "agree", "strongly_agree"))
-summary_dev$question <- factor(summary_dev$question, 
-                               levels = c("Shoreline_infrastructure",
-                                          "Cell_towers",
-                                          "Backlot_development"))
+summary_dev$question <- factor(summary_dev$question,
+                               levels = c("Enforcement_for_upkeep_of_waste_systems", "Shoreline_lot_minimum_frontage", "Shoreline_minimum_setback", "Shoreline_infrastructure", "Cell_towers", "Backlot_development", "Timeshare_dwellings", "Shipping_container_dwellings", "Hobby_farms", "Non-residential_commercial_development", "Floating_homes/barges", "Trailer_parks", "Condominiums"))
 ```
 
-Build plots:
+Build plot:
 
 ```{r}
 summary_dev %>% 
@@ -158,279 +175,474 @@ summary_dev %>%
   geom_bar(stat = "identity", 
            aes(x = question, y = prop_respondents, group = category, fill = category), 
            position = "stack") +
-  # scale_fill_manual(values = c("#186484", "#448cbc", "#ffd85b", "#d1864b", "#a95e37")) +
-  # scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
-  scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
+  # scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
   coord_flip() +
-  ylab("Proportion of respondents") +
-  xlab("Land use issue") +
-  theme(axis.title = element_text(size = 12),
+  ylab("Proportion of respondents (%)") +
+  # xlab("Land use issue") +
+  theme(axis.title.x = element_text(size = 12),
         axis.text = element_text(size = 10),
-        legend.position = "bottom") +
+        legend.position = "bottom",
+        axis.title.y = element_blank()) +
   scale_y_continuous(expand = c(0, 0))
 
-ggsave(here("plots", "dev_results_gradient.pdf"), height = 1.5, width = 7.6)
+ggsave(here("plots", "dev_results_gradient.pdf"), height = 3, width = 7.6)
 ```
-
-# Run MANOVA
 
 ### Nature
 
-```{r, results='hide'}
-# Response variables
-nature_resp <- cbind(dat$Preserve_Natural_Beauty, dat$Preserve_Natural_Shorelines,
-                     dat$Preserve_Unique_Habitats, dat$Protect_Native_Species, 
-                     dat$Control_Invasive_Species, dat$Improve_Water_Quality,
-                     dat$Encourage_Dark_Skies, dat$Increase_Water_Clarity, 
-                     dat$Decrease_Bacterial_Levels, dat$Reduce_Algal_Growth, 
-                     dat$Minimize_Water_Fluctuations)
+```{r}
+nat_dat <- dat %>% 
+  dplyr::select(Preserve_Natural_Beauty, Preserve_Natural_Shorelines, 
+                Preserve_Unique_Habitats, Protect_Native_Species, 
+                Control_Invasive_Species, Improve_Water_Quality,
+                Encourage_Dark_Skies, Increase_Water_Clarity,
+                Decrease_Bacterial_Levels, Reduce_Algal_Growth,
+                Minimize_Water_Fluctuations) %>% 
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Preserve_Natural_Beauty:Minimize_Water_Fluctuations,
+               names_to = "question", values_to = "response")
 
-# Lake as predictor
-Lake_manova <- manova(nature_resp ~ Lake, data = dat)
-# Age
-Age_manova <- manova(nature_resp ~ Age, data = dat)
-# Duration
-Duration_manova <- manova(nature_resp ~ Duration, data = dat)
-# Access
-Access_manova <- manova(nature_resp ~ Access, data = dat)
+nat_dat <- nat_dat %>% 
+  na.omit() %>% 
+  group_by(question) %>% 
+  mutate(category = case_when(response == 5 ~ "strongly_agree",
+                              response == 4 ~ "agree",
+                              response == 3 ~ "neither",
+                              response == 2 ~ "disagree",
+                              response == 1 ~ "strongly_disagree"))
+summary_nat <- nat_dat %>% 
+  group_by(question, category) %>% 
+  summarize(no_respondents = n())
 
-#Summary
-summary(Lake_manova)
-summary.aov(Lake_manova)
-#Summary
-summary(Age_manova)
-summary.aov(Age_manova)
-#Summary
-summary(Duration_manova)
-summary.aov(Duration_manova)
-#Summary
-summary(Access_manova)
-summary.aov(Access_manova)
+summary_nat <- summary_nat %>% 
+  mutate(total_respondents = sum(no_respondents),
+         prop_respondents = no_respondents/total_respondents*100) %>% 
+  # group_by(question, category) %>% 
+  arrange(prop_respondents)
+
+summary_nat$category <- factor(summary_nat$category, levels = c("strongly_disagree", "disagree", "neither", "agree", "strongly_agree"))
+summary_nat$question <- factor(summary_nat$question,
+                               levels = c("Minimize_Water_Fluctuations",
+                                          "Encourage_Dark_Skies",
+                                          "Increase_Water_Clarity",
+                                          "Preserve_Natural_Shorelines",
+                                          "Decrease_Bacterial_Levels",
+                                          "Protect_Native_Species",
+                                          "Reduce_Algal_Growth",
+                                          "Preserve_Unique_Habitats",
+                                          "Preserve_Natural_Beauty",
+                                          "Control_Invasive_Species",
+                                          "Improve_Water_Quality"))
 ```
 
-Visualize MANOVA results using a profile plot for nature-related questions and respondent age as a predictor.
+Build plot:
 
 ```{r}
-# Calculate group-based mean responses
-age_means <- dat %>% 
-  # Group by the predictor variable
-  # TODO change below to whichever predictor variable you want (e.g., Lake, Duration, etc.)
-  group_by(Age) %>% 
-  # TODO change below to whichever response variables relate to the category; in this case I'm specifying a range of columns (denoted using the : symbol) starting from Preserve_Natural_Beauty until Minimize_Water_Fluctuations
-  summarize_at(vars(Preserve_Natural_Beauty:Minimize_Water_Fluctuations), 
-               mean, na.rm = TRUE) %>% 
-  ungroup() %>%
-  # The following 'tidies' the dataset so that you no longer have separate columns for each of the response variables but instead a column for the response variable name and another for the mean value for that particular response
-  # TODO change below to the relevant column names for response variables
-  pivot_longer(cols = Preserve_Natural_Beauty:Minimize_Water_Fluctuations, 
-               names_to = "question", values_to = "mean")
-```
+summary_nat %>% 
+  ggplot() +
+  geom_bar(stat = "identity", 
+           aes(x = question, y = prop_respondents, group = category, fill = category), 
+           position = "stack") +
+  scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
+  # scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  coord_flip() +
+  ylab("Proportion of respondents (%)") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        legend.position = "bottom",
+        axis.title.y = element_blank()) +
+  scale_y_continuous(expand = c(0, 0))
 
-Build the plot I'd shown you! Be sure to modify anything below labeled *TODO* for other predictor or response variables.
-
-```{r}
-# TODO change data to dataset with means for the predictor variable (here, `age_means`)
-# TODO change below group to whichever predictor variable you want color-coded (here, Age)
-ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
-  # Add colorized rectangles based on which questions were significant in the MANOVA
-  # TODO change xmin and xmax based on where the specific significant questions are plotted and do +/- 0.5 so the box surrounds the data point
-  annotate("rect", xmin = 1.5, xmax = 2.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", alpha = 0.5) +
-  annotate("rect", xmin = 6.5, xmax = 7.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", color = "white", 
-           linewidth = 1, alpha = 0.5) +
-  annotate("rect", xmin = 7.5, xmax = 8.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", color = "white", 
-           linewidth = 1, alpha = 0.5) +
-  # TODO change below to colorize by whichever predictor variable you want
-  geom_line(aes(color = Age)) +
-  # TODO change below to colorize by whichever predictor variable you want
-  geom_point(aes(color = Age)) +
-  # TODO change title of plot to what you'd like
-  ggtitle("Age-based means for nature questions") +
-  # Specify y and x axis titles
-  ylab("Mean response") +
-  xlab("Survey question") +
-  # TODO customize your color palette for each of the predictor variable groups (here, the three age groups)
-  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
-  # Change the x axis text angle so it doesn't overlap and make font size 10
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
-
-# If you want to save the plot above to your current working directory:
-# TODO change "nature_age_means_plot.pdf" to whatever you want the file named
-# TODO change `width` and `height` to whatever dimensions you want (in inches)
-ggsave("nature_age_means_plot.pdf", width = 10, height = 6)
-```
-
-If you want to change the ordering of the survey questions (x axis labels):
-
-```{r}
-# Specify the class of the survey question column as a factor and change the levels to whatever ordering you want
-age_means$question <- factor(age_means$question, levels = c("Decrease_Bacterial_Levels",
-                                                            "Preserve_Natural_Beauty",
-                                                            "Preserve_Natural_Shorelines",
-                                                            "Control_Invasive_Species",
-                                                            "Encourage_Dark_Skies",
-                                                            "Improve_Water_Quality",
-                                                            "Increase_Water_Clarity",
-                                                            "Minimize_Water_Fluctuations",
-                                                            "Preserve_Unique_Habitats",
-                                                            "Protect_Native_Species",
-                                                            "Reduce_Algal_Growth"))
-
-# Now, build the plot in the exact same way as above and you should see the ordering change
-# You will need to change the colorized boxes such that they're still behind the significant variables which have now changed place:
-ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
-  # Add colorized rectangles based on which questions were significant in the MANOVA
-  annotate("rect", xmin = 0.5, xmax = 1.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", alpha = 0.5) +
-  annotate("rect", xmin = 1.5, xmax = 2.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", color = "white", 
-           linewidth = 1, alpha = 0.5) +
-  annotate("rect", xmin = 2.5, xmax = 3.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", color = "white", 
-           linewidth = 1, alpha = 0.5) +
-  geom_line(aes(color = Age)) +
-  geom_point(aes(color = Age)) +
-  ggtitle("Age-based means for nature questions") +
-  # Specify y and x axis titles
-  ylab("Mean response") +
-  xlab("Survey question") +
-  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
-  # Change the x axis text angle so it doesn't overlap and make font size 10
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
-```
-
-If you want to modify the survey question names (x axis labels), add `scale_x_discrete()` with `labels` specified.
-
-```{r}
-ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
-  # Add colorized rectangles based on which questions were significant in the MANOVA
-  annotate("rect", xmin = 0.5, xmax = 1.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", alpha = 0.5) +
-  annotate("rect", xmin = 1.5, xmax = 2.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", color = "white", 
-           linewidth = 1, alpha = 0.5) +
-  annotate("rect", xmin = 2.5, xmax = 3.5, ymin = 4, ymax = 5, 
-           fill = "mediumseagreen", color = "white", 
-           linewidth = 1, alpha = 0.5) +
-  geom_line(aes(color = Age)) +
-  geom_point(aes(color = Age)) +
-  ggtitle("Age-based means for nature questions") +
-  # Specify y and x axis titles
-  ylab("Mean response") +
-  xlab("Survey question") +
-  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
-  # Change the x axis text angle so it doesn't overlap and make font size 10
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10)) +
-  # TODO below is what changes the x axis labels:
-  scale_x_discrete(labels = c("Decrease Bacterial Levels",
-                              "Preserve Natural Beauty",
-                              "Preserve Natural Shorelines",
-                              "Control Invasive Species",
-                              "Encourage Dark Skies",
-                              "Improve Water Quality",
-                              "Increase Water Clarity",
-                              "Minimize Water Fluctuations",
-                              "Preserve Unique Habitats",
-                              "Protect Native Species",
-                              "Reduce Algal Growth"))
-```
-
-If you want to instead have the significant questions in a plot to the left and the remaining   questions to the right:
-
-```{r}
-# Add a new column to `age_means` that has whether the variable in that row was sig or not:
-age_means <- age_means %>% 
-  mutate(manova_result = case_when(question %in% c("Decrease_Bacterial_Levels", 
-                                                   "Preserve_Natural_Beauty", 
-                                                   "Preserve_Natural_Shorelines") 
-                                   # Put "sig" in the rows that have the above question
-                                   # within the new column ("manova_result")
-                                   ~ "sig",
-                                   question %in% c("Control_Invasive_Species",
-                                                   "Encourage_Dark_Skies",
-                                                   "Improve_Water_Quality",
-                                                   "Increase_Water_Clarity",
-                                                   "Minimize_Water_Fluctuations",
-                                                   "Preserve_Unique_Habitats",
-                                                   "Protect_Native_Species",
-                                                   "Reduce_Algal_Growth") 
-                                   # Put "nonsig" in the rows that have the above question
-                                   # within the new column ("manova_result")
-                                   ~ "nonsig"))
-
-# I want sig vars plotted first so I'm going to change the levels as I did before:
-age_means$manova_result <- factor(age_means$manova_result, levels = c("sig", "nonsig"))
-
-# Now, we can ask ggplot to build our plot but "facet" it on our newly made column such that the sig vars are in one plot and the non-sig ones are in a second one:
-ggplot(data = age_means, aes(x = question, y = mean, group = Age)) +
-  geom_line(aes(color = Age)) +
-  geom_point(aes(color = Age)) +
-  ggtitle("Age-based means for nature questions") +
-  # Specify y and x axis titles
-  ylab("Mean response") +
-  xlab("Survey question") +
-  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
-  # Change the x axis text angle so it doesn't overlap and make font size 10
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
-        # TODO change the size of the strip text
-        strip.text = element_text(size = 14),
-        # TODO remove grey background of strip
-        strip.background = element_blank()) +
-  # TODO here's the faceting step:
-  facet_grid(~manova_result, 
-             # Only plot sig or non-sig variables
-             scales = "free", 
-             # Standardize spacing
-             space = "free", 
-             # Add custom labels to the strips
-             labeller = as_labeller(c("sig" = "Significant questions",
-                                      "nonsig" = "Non-significant questions")))
-```
-
-### Development
-
-```{r, results='hide'}
-# TODO be aware that the column names require `` symbols for a couple of the development-related questions because they have special characters in them (see below)
-manova_access_v_development <- manova(cbind(Condominiums,	
-                                            Trailer_parks,
-                                            Shipping_container_dwellings,	
-                                            `Floating_homes/barges`,
-                                            Timeshare_dwellings, 
-                                            Hobby_farms,
-                                            `Non-residential_commercial_development`,	
-                                            Cell_towers,
-                                            Backlot_development,	
-                                            Shoreline_infrastructure,	
-                                            Shoreline_minimum_setback,
-                                            Shoreline_lot_minimum_frontage,	
-                                            Enforcement_for_upkeep_of_waste_systems)
-                                      ~ Access, data = dat)
-#Summary
-summary(manova_access_v_development)
-summary.aov(manova_access_v_development)
+ggsave(here("plots", "nat_results_gradient.pdf"), height = 3, width = 7.6)
 ```
 
 ### Legislation
 
-```{r, results='hide'}
-manova_age_v_legislation <- manova(cbind(Lower_speeds_in_open_water,
-                                         Lower_speeds_close_to_the_shoreline,
-                                         Watercraft_wake_height,
-                                         Lower_speeds_for_nesting_season,
-                                         Lower_watercraft_noise_levels,
-                                         Safer_operation_of_watercraft,	
-                                         Invasive_species_checks) 
-                                   ~ Age, data = dat)
-#Summary
-summary(manova_age_v_legislation)
-summary.aov(manova_age_v_legislation)
+```{r}
+soc_dat <- dat %>% 
+  dplyr::select(Lower_speeds_in_open_water,
+                Lower_speeds_close_to_the_shoreline,
+                Watercraft_wake_height,
+                Lower_speeds_for_nesting_season,
+                Lower_watercraft_noise_levels,
+                Safer_operation_of_watercraft,	
+                Invasive_species_checks) %>% 
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Lower_speeds_in_open_water:Invasive_species_checks,
+               names_to = "question", values_to = "response")
+
+soc_dat <- soc_dat %>% 
+  na.omit() %>% 
+  group_by(question) %>% 
+  mutate(category = case_when(response == 5 ~ "strongly_agree",
+                              response == 4 ~ "agree",
+                              response == 3 ~ "neither",
+                              response == 2 ~ "disagree",
+                              response == 1 ~ "strongly_disagree"))
+summary_soc <- soc_dat %>% 
+  group_by(question, category) %>% 
+  summarize(no_respondents = n())
+
+summary_soc <- summary_soc %>% 
+  mutate(total_respondents = sum(no_respondents),
+         prop_respondents = no_respondents/total_respondents*100) %>% 
+  # group_by(question, category) %>% 
+  arrange(prop_respondents)
+
+summary_soc$category <- factor(summary_soc$category, levels = c("strongly_disagree", "disagree", "neither", "agree", "strongly_agree"))
+summary_soc$question <- factor(summary_soc$question,
+                               levels = c("Lower_speeds_in_open_water",
+                                          "Lower_watercraft_noise_levels",
+                                          "Watercraft_wake_height",
+                                          "Safer_operation_of_watercraft",
+                                        "Lower_speeds_for_nesting_season",
+                                    "Lower_speeds_close_to_the_shoreline",
+                                          "Invasive_species_checks"))
 ```
 
-### Lake Use
+Build plot:
 
-```{r, results='hide'}
+```{r}
+summary_soc %>% 
+  ggplot() +
+  geom_bar(stat = "identity", 
+           aes(x = question, y = prop_respondents, group = category, fill = category), 
+           position = "stack") +
+  scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
+  # scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  coord_flip() +
+  ylab("Proportion of respondents (%)") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        legend.position = "bottom",
+        axis.title.y = element_blank()) +
+  scale_y_continuous(expand = c(0, 0))
+
+ggsave(here("plots", "soc_results_gradient.pdf"), height = 2, width = 7.6)
+```
+
+### Amenities
+
+```{r}
+ame_dat <- dat %>% 
+  dplyr::select(Frequency_of_O.P.P._marine_patrols,
+                Public_boat_launches,
+                Availability_of_safe_hiking_trails,
+                Availability_of_access_to_managed_snowmobile_trails,
+                Availability_of_groomed_cross_country_ski_trails,
+                Access_to_safe_ATV_trails,
+                Reliable_access_to_high_speed_internet,
+                Access_to_reliable_cellular_coverage,
+                Reopening_of_Hawk_Lake_landfill,
+                Number_of_businesses_offering_gasoline_fueling,
+                `Number_and_location_of_parking_facilities_[BHL]`,
+                `Number_and_location_of_parking_facilities_[LHL]`,
+                Number_of_public_beaches) %>% 
+  mutate(respondent = 1:nrow(dat)) %>% 
+  pivot_longer(cols = Frequency_of_O.P.P._marine_patrols:Number_of_public_beaches,
+               names_to = "question", values_to = "response")
+
+ame_dat <- ame_dat %>% 
+  na.omit() %>% 
+  group_by(question) %>% 
+  mutate(category = case_when(response == 5 ~ "strongly_agree",
+                              response == 4 ~ "agree",
+                              response == 3 ~ "neither",
+                              response == 2 ~ "disagree",
+                              response == 1 ~ "strongly_disagree"))
+summary_ame <- ame_dat %>% 
+  group_by(question, category) %>% 
+  summarize(no_respondents = n())
+
+summary_ame <- summary_ame %>% 
+  mutate(total_respondents = sum(no_respondents),
+         prop_respondents = no_respondents/total_respondents*100) %>% 
+  # group_by(question, category) %>% 
+  arrange(prop_respondents)
+
+summary_ame$category <- factor(summary_ame$category, levels = c("strongly_disagree", "disagree", "neither", "agree", "strongly_agree"))
+summary_ame$question <- factor(summary_ame$question,
+                               levels = c("Reliable_access_to_high_speed_internet", "Access_to_reliable_cellular_coverage",
+                                          "Availability_of_safe_hiking_trails",
+                                          "Number_of_businesses_offering_gasoline_fueling",
+                                          "Number_and_location_of_parking_facilities_[BHL]",
+                "Number_and_location_of_parking_facilities_[LHL]",
+                "Public_boat_launches",
+                "Availability_of_groomed_cross_country_ski_trails",
+                "Number_of_public_beaches",
+                "Availability_of_access_to_managed_snowmobile_trails",
+                "Frequency_of_O.P.P._marine_patrols",
+                "Access_to_safe_ATV_trails",
+                "Reopening_of_Hawk_Lake_landfill"))
+```
+
+Build plot:
+
+```{r}
+summary_ame %>% 
+  ggplot() +
+  geom_bar(stat = "identity", 
+           aes(x = question, y = prop_respondents, group = category, fill = category), 
+           position = "stack") +
+  scale_fill_manual(values = c("#a95e37", "#d1864b", "#ffd85b", "#448cbc", "#186484")) +
+  # scale_fill_manual(values = c("#90dcfc", "#72bede", "#54a0c0", "#186484", "#045070")) +
+  coord_flip() +
+  ylab("Proportion of respondents (%)") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text = element_text(size = 10),
+        legend.position = "bottom",
+        axis.title.y = element_blank()) +
+  scale_y_continuous(expand = c(0, 0))
+
+ggsave(here("plots", "ame_results_gradient.pdf"), height = 3, width = 7.6)
+```
+
+### Average value across each category
+
+```{r}
+# Retrieve question names for each category
+leg_vars <- unique(soc_dat$question)
+lakeuse_vars <- unique(lake_use$question)
+amen_vars <- unique(ame_dat$question)
+dev_vars <- unique(dev_dat$question)
+nat_vars <- unique(nat_dat$question)
+```
+
+Do calculations for averages.
+
+```{r}
+### Legislation
+# Calculate average values for each category from above avgs
+leg_overall_mean <- soc_dat %>%
+  ungroup() %>% 
+  summarise(m = mean(response, na.rm = TRUE)) %>%
+  pull(m)
+# Calculate average values for each question
+leg_question_means <- soc_dat %>%
+  group_by(question) %>%
+  summarise(m = mean(response, na.rm = TRUE)) %>% 
+  mutate(category = "legislation",
+         overall_mean = leg_overall_mean)
+
+### Nature
+# Calculate average values for each category from above avgs
+nat_overall_mean <- nat_dat %>%
+  ungroup() %>% 
+  summarise(m = mean(response, na.rm = TRUE)) %>%
+  pull(m)
+# Calculate average values for each question
+nat_question_means <- nat_dat %>%
+  group_by(question) %>%
+  summarise(m = mean(response, na.rm = TRUE)) %>% 
+  mutate(category = "nature",
+         overall_mean = nat_overall_mean)
+
+### Development
+# Calculate average values for each category from above avgs
+dev_overall_mean <- dev_dat %>%
+  ungroup() %>% 
+  summarise(m = mean(response, na.rm = TRUE)) %>%
+  pull(m)
+# Calculate average values for each question
+dev_question_means <- dev_dat %>%
+  group_by(question) %>%
+  summarise(m = mean(response, na.rm = TRUE)) %>% 
+  mutate(category = "development",
+         overall_mean = dev_overall_mean)
+
+### Lake use
+# Calculate average values for each category from above avgs
+lakeuse_overall_mean <- lake_use %>%
+  ungroup() %>% 
+  summarise(m = mean(response, na.rm = TRUE)) %>%
+  pull(m)
+# Calculate average values for each question
+lakeuse_question_means <- lake_use %>%
+  group_by(question) %>%
+  summarise(m = mean(response, na.rm = TRUE)) %>% 
+  mutate(category = "lake_use",
+         overall_mean = lakeuse_overall_mean)
+
+### Amenities
+# Calculate average values for each category from above avgs
+amen_overall_mean <- ame_dat %>%
+  ungroup() %>% 
+  summarise(m = mean(response, na.rm = TRUE)) %>%
+  pull(m)
+# Calculate average values for each question
+amen_question_means <- ame_dat %>%
+  group_by(question) %>%
+  summarise(m = mean(response, na.rm = TRUE)) %>% 
+  mutate(category = "amenities",
+         overall_mean = amen_overall_mean)
+
+### Bind them all together
+# mean_dat <- bind_rows(leg_question_means,
+#                       nat_question_means,
+#                       dev_question_means,
+#                       lakeuse_question_means,
+#                       amen_question_means)
+# mean_plot_dat <- bind_rows(ame_dat %>% mutate(group = "amenities"),
+#                            soc_dat %>% mutate(group = "legislation"),
+#                            dev_dat %>% mutate(group = "development"),
+#                            nat_dat %>% mutate(group = "nature"),
+#                            lake_use %>% mutate(group = "lake_use"))
+```
+
+Build plots.
+
+```{r}
+### Legislation
+soc_dat %>% 
+  ggplot(aes(x = reorder(question, response), y = response)) +
+  geom_boxplot(outlier.alpha = 0.3) +
+  geom_point(data = leg_question_means, aes(x = question, y = m),
+             color = "cornflowerblue", size = 2) +
+  geom_hline(yintercept = unique(leg_question_means$overall_mean), color = "coral") +
+  ggtitle("Legislation questions: response scores") +
+  ylab("Response score") +
+  xlab("Survey question") +
+  theme(axis.text.x = element_blank(),
+        # axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        plot.title = element_text(size = 14))
+ggsave(here("plots/leg_means.pdf"), width = 6, height = 4)
+
+### Lake use
+lake_use %>% 
+  ggplot(aes(x = reorder(question, response), y = response)) +
+  geom_boxplot(outlier.alpha = 0.3) +
+  geom_point(data = lakeuse_question_means, aes(x = question, y = m),
+             color = "cornflowerblue", size = 2) +
+  geom_hline(yintercept = unique(lakeuse_question_means$overall_mean), color = "coral") +
+  ggtitle("Lake use questions: response scores") +
+  ylab("Response score") +
+  xlab("Survey question") +
+  theme(axis.text.x = element_blank(),
+        # axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        plot.title = element_text(size = 14))
+ggsave(here("plots/lakeuse_means.pdf"), width = 6, height = 4)
+
+### Development
+dev_dat %>% 
+  ggplot(aes(x = reorder(question, response), y = response)) +
+  geom_boxplot(outlier.alpha = 0.3) +
+  geom_point(data = dev_question_means, aes(x = question, y = m),
+             color = "cornflowerblue", size = 2) +
+  geom_hline(yintercept = unique(dev_question_means$overall_mean), color = "coral") +
+  ggtitle("Development questions: response scores") +
+  ylab("Response score") +
+  xlab("Survey question") +
+  theme(axis.text.x = element_blank(),
+        # axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        plot.title = element_text(size = 14))
+ggsave(here("plots/dev_means.pdf"), width = 6, height = 4)
+
+### Nature
+nat_dat %>% 
+  ggplot(aes(x = reorder(question, response), y = response)) +
+  geom_boxplot(outlier.alpha = 0.3) +
+  geom_point(data = nat_question_means, aes(x = question, y = m),
+             color = "cornflowerblue", size = 2) +
+  geom_hline(yintercept = unique(nat_question_means$overall_mean), color = "coral") +
+  ggtitle("Nature questions: response scores") +
+  ylab("Response score") +
+  xlab("Survey question") +
+  theme(axis.text.x = element_blank(),
+        # axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        plot.title = element_text(size = 14))
+ggsave(here("plots/nature_means.pdf"), width = 6, height = 4)
+
+### Amenities
+ame_dat %>% 
+  ggplot(aes(x = reorder(question, response), y = response)) +
+  geom_boxplot(outlier.alpha = 0.3) +
+  geom_point(data = amen_question_means, aes(x = question, y = m),
+             color = "cornflowerblue", size = 2) +
+  geom_hline(yintercept = unique(amen_question_means$overall_mean), color = "coral") +
+  ggtitle("Amenities questions: response scores") +
+  ylab("Response score") +
+  xlab("Survey question") +
+  theme(axis.text.x = element_blank(),
+        # axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        plot.title = element_text(size = 14)) +
+  scale_y_continuous(limits = c(1, 5))
+ggsave(here("plots/amen_means.pdf"), width = 6, height = 4)
+```
+
+Save all of the above plots.
+
+```{r}
+p_nat
+p_leg
+p_lakeuse
+p_dev
+p_amen
+```
+
+# Testing for predictors
+
+We want to see if there are any significant predictors for survey responses. To do so, we assessed survey responses based on four factors:
+
+1.  Age of association member
+
+2.  Length of property ownership
+
+3.  The lake that the member has property on
+
+4.  Type of property access
+
+### Specify response variables (i.e., corresponding columns)
+
+```{r}
+# Nature-related questions
+nature_resp <- cbind(dat$Preserve_Natural_Beauty,
+                     dat$Preserve_Natural_Shorelines,
+                     dat$Preserve_Unique_Habitats,
+                     dat$Protect_Native_Species, 
+                     dat$Control_Invasive_Species,
+                     dat$Improve_Water_Quality,
+                     dat$Encourage_Dark_Skies, 
+                     dat$Increase_Water_Clarity, 
+                     dat$Decrease_Bacterial_Levels,
+                     dat$Reduce_Algal_Growth, 
+                     dat$Minimize_Water_Fluctuations)
+
+# Development-related questions
+dev_resp <- cbind(dat$Condominiums,	
+                  dat$Trailer_parks,
+                  dat$Shipping_container_dwellings,
+                  dat$`Floating_homes/barges`,
+                  dat$Timeshare_dwellings, 
+                  dat$Hobby_farms,
+                  dat$`Non-residential_commercial_development`,	
+                  dat$Cell_towers,
+                  dat$Backlot_development,	
+                  dat$Shoreline_infrastructure,	
+                  dat$Shoreline_minimum_setback,
+                  dat$Shoreline_lot_minimum_frontage,	
+                  dat$Enforcement_for_upkeep_of_waste_systems)
+
+# Legislation-related questions
+leg_resp <- cbind(dat$Lower_speeds_in_open_water,
+                  dat$Lower_speeds_close_to_the_shoreline,
+                  dat$Watercraft_wake_height,
+                  dat$Lower_speeds_for_nesting_season,
+                  dat$Lower_watercraft_noise_levels,
+                  dat$Safer_operation_of_watercraft,	
+                  dat$Invasive_species_checks)
+
+# Lake use-related questions
 lakeuse_resp <- cbind(dat$Construction_of_water_ski_courses, 
                       dat$Fishing_and_angling,	
                       dat$Fishing_tournaments_and_derbies,	
@@ -443,41 +655,323 @@ lakeuse_resp <- cbind(dat$Construction_of_water_ski_courses,
                       dat$Number_of_people_using_campsites,
                       dat$Pollution_from_campsites)
 
-#MANOVA - Age v lake use
-manova_age_v_lakeuse <- manova(lakeuse_resp ~ Age, data = dat)
-
-#Summary
-summary(manova_age_v_lakeuse)
-summary.aov(manova_age_v_lakeuse)
-
-#MANOVA - Access v lake use
-manova_access_v_lakeuse <- manova(lakeuse_resp ~ Access, data = dat)
-#Summary
-summary(manova_access_v_lakeuse)
-summary.aov(manova_access_v_lakeuse)
+# Amenities-related questions
+amen_resp <- cbind(dat$Frequency_of_O.P.P._marine_patrols,
+                   dat$Public_boat_launches,
+                   dat$Availability_of_safe_hiking_trails,
+                   dat$Availability_of_access_to_managed_snowmobile_trails,
+                   dat$Availability_of_groomed_cross_country_ski_trails,
+                   dat$Access_to_safe_ATV_trails,
+                   dat$Reliable_access_to_high_speed_internet,
+                   dat$Access_to_reliable_cellular_coverage,
+                   dat$Reopening_of_Hawk_Lake_landfill,
+                   dat$Number_of_businesses_offering_gasoline_fueling,
+                   dat$`Number_and_location_of_parking_facilities_[BHL]`,
+                   dat$`Number_and_location_of_parking_facilities_[LHL]`,
+                   dat$Number_of_public_beaches)
 ```
 
-### Amenities
+### Run MANOVAs
 
 ```{r, results='hide'}
-#MANOVA - Access v AMENITIES
-manova_access_v_amenities <- manova(cbind(Frequency_of_O.P.P._marine_patrols,
-                                          Public_boat_launches,
-                                          Availability_of_safe_hiking_trails,
-                                          Availability_of_access_to_managed_snowmobile_trails,
-                                          Availability_of_groomed_cross_country_ski_trails,
-                                          Access_to_safe_ATV_trails,
-                                          Reliable_access_to_high_speed_internet,
-                                          Access_to_reliable_cellular_coverage,
-                                          Reopening_of_Hawk_Lake_landfill,
-                                          Number_of_businesses_offering_gasoline_fueling,
-                                          `Number_and_location_of_parking_facilities_[BHL]`,
-                                          `Number_and_location_of_parking_facilities_[LHL]`,
-                                          Number_of_public_beaches)
-                                    ~ Access, data = dat)
-#Summary
-summary(manova_access_v_amenities)
-summary.aov(manova_access_v_amenities)
+# Nature variables
+nature_lake_manova <- manova(nature_resp ~ Lake, data = dat)
+nature_age_manova <- manova(nature_resp ~ Age, data = dat)
+nature_duration_manova <- manova(nature_resp ~ Duration, data = dat)
+nature_access_manova <- manova(nature_resp ~ Access, data = dat)
+
+# Development variables
+dev_lake_manova <- manova(dev_resp ~ Lake, data = dat)
+dev_age_manova <- manova(dev_resp ~ Age, data = dat)
+dev_duration_manova <- manova(dev_resp ~ Duration, data = dat)
+dev_access_manova <- manova(dev_resp ~ Access, data = dat)
+
+# Legislation variables
+leg_lake_manova <- manova(leg_resp ~ Lake, data = dat)
+leg_age_manova <- manova(leg_resp ~ Age, data = dat)
+leg_duration_manova <- manova(leg_resp ~ Duration, data = dat)
+leg_access_manova <- manova(leg_resp ~ Access, data = dat)
+
+# Lake use variables
+lakeuse_lake_manova <- manova(lakeuse_resp ~ Lake, data = dat)
+lakeuse_age_manova <- manova(lakeuse_resp ~ Age, data = dat)
+lakeuse_duration_manova <- manova(lakeuse_resp ~ Duration, data = dat)
+lakeuse_access_manova <- manova(lakeuse_resp ~ Access, data = dat)
+
+# Amenities variables
+amen_lake_manova <- manova(amen_resp ~ Lake, data = dat)
+amen_age_manova <- manova(amen_resp ~ Age, data = dat)
+amen_duration_manova <- manova(amen_resp ~ Duration, data = dat)
+amen_access_manova <- manova(amen_resp ~ Access, data = dat)
+```
+
+### MANOVA summaries and significant predictors
+
+```{r}
+summary(nature_lake_manova)
+summary(nature_access_manova)
+summary(nature_age_manova)
+summary(nature_duration_manova)
+
+summary(dev_lake_manova)
+summary(dev_access_manova) # sig
+summary(dev_age_manova)
+summary(dev_duration_manova)
+
+summary(leg_lake_manova)
+summary(leg_access_manova)
+summary(leg_age_manova) # sig
+summary(leg_duration_manova)
+
+summary(lakeuse_lake_manova)
+summary(lakeuse_access_manova) # sig
+summary(lakeuse_age_manova) # sig
+summary(lakeuse_duration_manova)
+
+summary(amen_lake_manova) # sig
+summary(amen_access_manova) # sig
+summary(amen_age_manova)
+summary(amen_duration_manova)
+```
+
+Look at which response variables were significant. To determine which variables are driving the significant effect, we can run separate ANOVAs for each response variable. We report MANOVA results using Pillai's Trace, which is the multivariate effect size/statistic (wherein larger values indicate stronger separation among groups), and the p-value.
+
+```{r}
+# Survey results where lake access affects response
+summary(dev_access_manova) # sig PT = 0.234, p = 0.036
+summary.aov(dev_access_manova)
+
+summary(lakeuse_access_manova) # sig PT = 0.23537, p = 0.02495
+summary.aov(lakeuse_access_manova)
+
+summary(amen_access_manova) # sig PT = 0.76122, p = 0.06155
+summary.aov(amen_access_manova)
+
+# Survey results where age affects response
+summary(leg_age_manova) # sig PT = 0.12044, p = 0.06702
+summary.aov(leg_age_manova)
+summary(lakeuse_age_manova) # sig PT = 0.23207, p = 0.02861
+summary.aov(lakeuse_age_manova)
+
+# Survey results where specific lake affects response
+summary(amen_lake_manova) # sig PT = 1.6541, p = 0.002655
+summary.aov(amen_lake_manova)
+```
+
+```{r}
+# Re-run MANOVA for only our three lakes + Kennisis River
+dat_hhlpoa <- dat %>% filter(Lake %in% c("Big Hawk Lake", "Halls Lake", "Kennisis River", "Little Hawk Lake"))
+amen_resp_hhlpoa <- cbind(dat_hhlpoa$Frequency_of_O.P.P._marine_patrols,
+                   dat_hhlpoa$Public_boat_launches,
+                   dat_hhlpoa$Availability_of_safe_hiking_trails,
+                   dat_hhlpoa$Availability_of_access_to_managed_snowmobile_trails,
+                   dat_hhlpoa$Availability_of_groomed_cross_country_ski_trails,
+                   dat_hhlpoa$Access_to_safe_ATV_trails,
+                   dat_hhlpoa$Reliable_access_to_high_speed_internet,
+                   dat_hhlpoa$Access_to_reliable_cellular_coverage,
+                   dat_hhlpoa$Reopening_of_Hawk_Lake_landfill,
+                   dat_hhlpoa$Number_of_businesses_offering_gasoline_fueling,
+                   dat_hhlpoa$`Number_and_location_of_parking_facilities_[BHL]`,
+                   dat_hhlpoa$`Number_and_location_of_parking_facilities_[LHL]`,
+                   dat_hhlpoa$Number_of_public_beaches)
+# Run the MANOVA
+amen_lake_hhlpoa_manova <- manova(amen_resp_hhlpoa ~ Lake, data = dat_hhlpoa)
+summary(amen_lake_hhlpoa_manova) # sig PT = 1.3231, p = 0.003087
+```
+
+### Build plots
+
+#### Age as a predictor
+
+Only build plots for significant predictors. First, let's look at categories where age was found to be a significant predictor for survey response. 
+
+```{r}
+# For age, want to extract lake use and legislation vals
+# Calculate group-based mean responses
+age_means <- dat %>%
+  mutate(
+    legislative = rowMeans(
+      dplyr::select(., all_of(leg_vars)),
+      na.rm = TRUE),
+    lake_use = rowMeans(
+      dplyr::select(., all_of(lakeuse_vars)),
+      na.rm = TRUE))
+age_plot_df <- age_means %>%
+  dplyr::select(Age, legislative, lake_use) %>%
+  pivot_longer(
+    cols = c(legislative, lake_use),
+    names_to = "category",
+    values_to = "score"
+  )
+age_plot_summary <- age_plot_df %>%
+  group_by(Age, category) %>%
+  summarise(
+    mean = mean(score, na.rm = TRUE),
+    sd = sd(score, na.rm = TRUE),
+    n = sum(!is.na(score)),
+    se = sd / sqrt(n),
+    .groups = "drop"
+  )
+age_plot_summary$Age <- factor(age_plot_summary$Age, levels = c("Under 25 years old", "26 - 55 years old", "56 + years old"))
+```
+
+Build the plot for age:
+
+```{r}
+age_plot_summary %>% 
+  ggplot(aes(x = Age, y = mean, color = Age)) +
+  geom_errorbar(aes(ymin = mean - se,
+                    ymax = mean + se),
+                width = 0.35,
+                linewidth = 1) +
+  geom_point(size = 2) +
+  ylab("Respondent agreement") +
+  xlab("Age group") +
+  scale_color_manual(values = c("#208c74", "#a82c94", "#bd724b")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        legend.position = "none") +
+  facet_wrap(~category, scales = "free_y") +
+  scale_y_continuous(limits = c(0, 5))
+
+ggsave(here("plots/age_means_plot.pdf"), width = 6, height = 4)
+```
+
+#### Access as a predictor
+
+```{r}
+# For access, want to extract lake use, development, and amenities vals
+# Calculate group-based mean responses
+access_means <- dat %>%
+  mutate(
+    development = rowMeans(
+      dplyr::select(., all_of(dev_vars)),
+      na.rm = TRUE),
+    lake_use = rowMeans(
+      dplyr::select(., all_of(lakeuse_vars)),
+      na.rm = TRUE),
+    amen = rowMeans(
+      dplyr::select(., all_of(amen_vars)),
+      na.rm = TRUE))
+access_plot_df <- access_means %>%
+  dplyr::select(Access, development, lake_use, amen) %>%
+  pivot_longer(
+    cols = c(development, lake_use, amen),
+    names_to = "category",
+    values_to = "score"
+  )
+access_plot_summary <- access_plot_df %>%
+  group_by(Access, category) %>%
+  summarise(
+    mean = mean(score, na.rm = TRUE),
+    sd = sd(score, na.rm = TRUE),
+    n = sum(!is.na(score)),
+    se = sd / sqrt(n),
+    .groups = "drop"
+  )
+access_plot_summary$Access <- factor(access_plot_summary$Access, levels = c("Private road", "Public road", "Water"))
+```
+
+Build the plot for access:
+
+```{r}
+access_plot_summary %>% 
+  ggplot(aes(x = Access, y = mean, color = Access)) +
+  geom_errorbar(aes(ymin = mean - se,
+                    ymax = mean + se),
+                width = 0.35,
+                linewidth = 1) +
+  geom_point(size = 2) +
+  ylab("Respondent agreement") +
+  xlab("Property access type") +
+  scale_color_manual(values = c("#f6c34c", "#6b4e20", "#306281")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        legend.position = "none") +
+  facet_wrap(~category, scales = "free_y") +
+  scale_y_continuous(limits = c(0, 5))
+
+ggsave(here("plots/access_means_plot.pdf"), width = 9, height = 4)
+```
+
+#### Waterbody as a predictor
+
+```{r}
+# For waterbody, want to extract amenities vals
+# Calculate group-based mean responses
+waterbody_means <- dat %>%
+  mutate(
+    amen = rowMeans(
+      dplyr::select(., all_of(amen_vars)),
+      na.rm = TRUE))
+waterbody_plot_df <- waterbody_means %>%
+  dplyr::select(Lake, amen) %>%
+  pivot_longer(
+    cols = c(amen),
+    names_to = "category",
+    values_to = "score"
+  )
+waterbody_plot_summary <- waterbody_plot_df %>%
+  group_by(Lake, category) %>%
+  summarise(
+    mean = mean(score, na.rm = TRUE),
+    sd = sd(score, na.rm = TRUE),
+    n = sum(!is.na(score)),
+    se = sd / sqrt(n),
+    .groups = "drop"
+  )
+# waterbody_plot_summary$Lake <- factor(waterbody_plot_summary$Lake, levels = c(TODO))
+```
+
+Build the plot for waterbody:
+
+```{r}
+waterbody_plot_summary %>% 
+  filter(Lake %in% c("Big Hawk Lake", "Little Hawk Lake", "Kennisis River", "Halls Lake")) %>% 
+  ggplot(aes(x = Lake, y = mean, color = Lake)) +
+  geom_errorbar(aes(ymin = mean - se,
+                    ymax = mean + se),
+                width = 0.35,
+                linewidth = 1) +
+  geom_point(size = 2) +
+  ylab("Respondent agreement") +
+  xlab("Waterbody where property is located") +
+  scale_color_manual(values = lake_col_full) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        legend.position = "none") +
+  facet_wrap(~category, scales = "free_y") +
+  scale_y_continuous(limits = c(0, 5))
+
+ggsave(here("plots/waterbody_means_plot.pdf"), width = 3, height = 4)
+```
+
+### Build tables
+
+```{r}
+results <- tibble(
+  Response = paste("Response", 1:13),
+  F_value = c(6.4713, 5.0354, 1.3434, 4.0149, 4.3188,
+              4.4568, 5.2688, 0.9747, 3.349,
+              0.9987, 2.2859, 0.2315, 0.6872),
+  p_value = c(0.001964, 0.007526, 0.2638, 0.01981,
+              0.01483, 0.01301, 0.006041,
+              0.3794, 0.03749, 0.3706,
+              0.1049, 0.7936, 0.5044)
+)
+
+results <- results %>%
+  mutate(sig = case_when(
+    p_value < 0.001 ~ "***",
+    p_value < 0.01  ~ "**",
+    p_value < 0.05  ~ "*",
+    TRUE ~ "ns"
+  ))
+results <- results %>%
+  arrange(p_value) %>%
+  mutate(Response = factor(Response, levels = Response))
+
+tbl <- results %>%
+  filter(p_value <= 0.05) %>% 
+  gt::gt() %>%
+  gtExtras::gt_hulk_col_numeric(p_value, trim = TRUE, reverse = TRUE)
 ```
 
 ## Top 11 issues
@@ -503,22 +997,99 @@ top_issues <- read_tsv(here("data", "survey_top_issues.txt")) %>%
                            answer_code == "2d" ~ "water_levels"))
 ```
 
-Top three issues
+Top three issues:
 
 ```{r}
 # Overall
 top_issues %>% 
   group_by(issue) %>% 
   summarise(n()) %>% 
-  top_n(3)
+  top_n(3) %>% 
+  arrange(desc(`n()`))
 
 # By lake/river
 top_issues %>% 
   filter(Lake %in% c("Halls Lake", "Little Hawk Lake", "Big Hawk Lake", "Kennisis River")) %>% 
   group_by(Lake, issue) %>% 
   summarise(n()) %>% 
-  top_n(3)
+  top_n(3) %>% 
+  arrange(desc(`n()`))
+```
 
-# By age group
+### Plot data
 
+```{r}
+top_issues %>% 
+  count(issue, sort = TRUE) %>%
+  mutate(issue = fct_reorder(issue, desc(n))) %>%
+  ggplot(aes(x = issue, y = n)) +
+  geom_col(fill = "cornflowerblue") +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Number of votes") +
+  xlab("Issue")
+
+ggsave(here("plots", "top_issues.pdf"), height = 4, width = 4)
+```
+
+Break up results based on the lake:
+
+```{r}
+top_issues %>% 
+  filter(Lake %in% c("Halls Lake", "Little Hawk Lake", "Big Hawk Lake", "Kennisis River")) %>% 
+  count(Lake, issue, sort = TRUE) %>%
+  mutate(issue = fct_reorder(issue, n, .desc = TRUE)) %>%
+  ggplot(aes(x = issue, y = n, fill = Lake)) +
+  geom_col() +
+  facet_wrap(~Lake, nrow = 2) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Number of votes") +
+  xlab("Issue") +
+  scale_fill_manual(values = lake_col_full) +
+  theme(legend.position = "none")
+
+ggsave(here("plots", "top_issues_bywaterbody.pdf"), height = 8, width = 8)
+```
+
+## Residency pie charts
+
+Import data:
+```{r}
+res <- read_tsv(here("data/residency_survey.txt"))
+res$Response <- factor(res$Response, 
+                          levels = c("7+_mos", "4-6_mos", "2-3_mos", "15-30_d", "1-14d", "0_mos", "Undecided", "No", "Yes", "Already_is"))
+```
+
+Build pie charts:
+```{r}
+ggplot(res %>% filter(Category == "Residence_timing"), 
+       aes(x = "", y = Percentage, fill = Response)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  # scale_fill_manual(values = MVZ_palette("LifeHistories")) +
+  scale_fill_manual(values = MVZ_palette("WesternBirds")) +
+  # scale_fill_manual(values = data_cols) +
+  theme(axis.title = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "bottom")
+
+ggsave(here("plots/residence_timing.pdf"), width = 4.75, height = 5)
+
+ggplot(res %>% filter(Category == "Future_residence"), 
+       aes(x = "", y = Percentage, fill = Response)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  # scale_fill_manual(values = MVZ_palette("LifeHistories")) +
+  scale_fill_manual(values = MVZ_palette("WesternBirds")) +
+  # scale_fill_manual(values = data_cols) +
+  theme(axis.title = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "bottom")
+
+ggsave(here("plots/fulltime_residence.pdf"), width = 4.75, height = 5)
 ```
