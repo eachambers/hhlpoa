@@ -31,7 +31,7 @@ Water level data were downloaded using the HYDAT database [here](https://waterof
 
 ```{r}
 hist <- read_csv(here("data/daily_20260812T1753.csv"))
-current <- read_csv(here("data/02EA020_HGD_20260812T1755.csv")) %>% 
+current <- read_csv(here("data/02EA020_HGD_20260812T1940.csv")) %>% 
   rename(Date = Date_est, Value = `Value_(m)`)
 
 hist$Date <- lubridate::ymd(hist$Date)
@@ -74,7 +74,12 @@ ggplot() +
   geom_line(data = summary,
             aes(x = DOY, y = Average), 
             color = "dodgerblue1", linetype = "dashed", linewidth = 1) +
-  # Add 2026 data only
+  # Add 2025-6 data on top
+  geom_line(data = levels %>% 
+              filter(Year == 2025), 
+            aes(x = DOY, y = Value), 
+            linewidth = 1,
+            color = "coral") +
   geom_line(data = levels %>% 
               filter(Year == 2026), 
             aes(x = DOY, y = Value), 
