@@ -41,10 +41,13 @@ current$Date <- lubridate::ymd(current$Date)
 levels <- bind_rows(hist %>% dplyr::select(Date, Value),
                     current %>% dplyr::select(Date, Value)) %>% 
   mutate("Year" = year(Date),
-         "DOY" = yday(Date))
+         "DOY" = yday(Date)) %>% 
+  na.omit()
 
-# Calculate monthly min, max, and average across all years
+# Calculate monthly min, max, and average
 summary <- levels %>% 
+  # Only calculate for 2025 and earlier
+  filter(!Year == 2026) %>% 
   group_by(DOY) %>% 
   summarize(Average = mean(Value),
             Maximum = max(Value),
